@@ -52,6 +52,9 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "LogForm";
             this.Text = "LogForm";
+            this.Activated += new System.EventHandler(this.LogForm_Activated);
+            this.Deactivate += new System.EventHandler(this.LogForm_Deactivate);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.LogForm_FormClosing);
             this.ResumeLayout(false);
 
         }

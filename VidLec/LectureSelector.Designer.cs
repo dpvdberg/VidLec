@@ -44,19 +44,15 @@
             this.spacer = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
-            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.verboseLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.enableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.disableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.enabledisableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.enableToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.disableToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.NetworkStatusStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.DropDownSetOnline = new System.Windows.Forms.ToolStripMenuItem();
             this.DropDownForceOffline = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loggingEnableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openLogWindowStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loggingDebugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TLPSplit.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.olvPresentations)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tlvAll)).BeginInit();
@@ -212,80 +208,6 @@
             this.menuStrip.TabIndex = 2;
             this.menuStrip.Text = "menuStrip";
             // 
-            // optionsToolStripMenuItem
-            // 
-            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.loggingToolStripMenuItem});
-            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
-            this.optionsToolStripMenuItem.Text = "Options";
-            // 
-            // loggingToolStripMenuItem
-            // 
-            this.loggingToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.viewLogToolStripMenuItem,
-            this.verboseLogToolStripMenuItem,
-            this.enabledisableToolStripMenuItem,
-            this.toolStripMenuItem1});
-            this.loggingToolStripMenuItem.Name = "loggingToolStripMenuItem";
-            this.loggingToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
-            this.loggingToolStripMenuItem.Text = "Logging";
-            // 
-            // viewLogToolStripMenuItem
-            // 
-            this.viewLogToolStripMenuItem.Name = "viewLogToolStripMenuItem";
-            this.viewLogToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.viewLogToolStripMenuItem.Text = "View log";
-            // 
-            // verboseLogToolStripMenuItem
-            // 
-            this.verboseLogToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.enableToolStripMenuItem,
-            this.disableToolStripMenuItem});
-            this.verboseLogToolStripMenuItem.Name = "verboseLogToolStripMenuItem";
-            this.verboseLogToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.verboseLogToolStripMenuItem.Text = "Verbose log";
-            // 
-            // enableToolStripMenuItem
-            // 
-            this.enableToolStripMenuItem.Name = "enableToolStripMenuItem";
-            this.enableToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.enableToolStripMenuItem.Text = "Enable";
-            // 
-            // disableToolStripMenuItem
-            // 
-            this.disableToolStripMenuItem.Name = "disableToolStripMenuItem";
-            this.disableToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.disableToolStripMenuItem.Text = "Disable";
-            // 
-            // enabledisableToolStripMenuItem
-            // 
-            this.enabledisableToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.enableToolStripMenuItem1,
-            this.disableToolStripMenuItem1});
-            this.enabledisableToolStripMenuItem.Name = "enabledisableToolStripMenuItem";
-            this.enabledisableToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.enabledisableToolStripMenuItem.Text = "Enable/disable";
-            // 
-            // enableToolStripMenuItem1
-            // 
-            this.enableToolStripMenuItem1.Name = "enableToolStripMenuItem1";
-            this.enableToolStripMenuItem1.Size = new System.Drawing.Size(112, 22);
-            this.enableToolStripMenuItem1.Text = "Enable";
-            // 
-            // disableToolStripMenuItem1
-            // 
-            this.disableToolStripMenuItem1.Name = "disableToolStripMenuItem1";
-            this.disableToolStripMenuItem1.Size = new System.Drawing.Size(112, 22);
-            this.disableToolStripMenuItem1.Text = "Disable";
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.CheckOnClick = true;
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            this.toolStripMenuItem1.Text = "toolStripMenuItem1";
-            // 
             // NetworkStatusStrip
             // 
             this.NetworkStatusStrip.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -299,16 +221,69 @@
             // DropDownSetOnline
             // 
             this.DropDownSetOnline.Name = "DropDownSetOnline";
-            this.DropDownSetOnline.Size = new System.Drawing.Size(152, 22);
+            this.DropDownSetOnline.Size = new System.Drawing.Size(143, 22);
             this.DropDownSetOnline.Text = "Check online";
             this.DropDownSetOnline.Click += new System.EventHandler(this.DropDownSetOnline_Click);
             // 
             // DropDownForceOffline
             // 
             this.DropDownForceOffline.Name = "DropDownForceOffline";
-            this.DropDownForceOffline.Size = new System.Drawing.Size(152, 22);
+            this.DropDownForceOffline.Size = new System.Drawing.Size(143, 22);
             this.DropDownForceOffline.Text = "Force offline";
             this.DropDownForceOffline.Click += new System.EventHandler(this.DropDownForceOffline_Click);
+            // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loggingToolStripMenuItem});
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Text = "Options";
+            // 
+            // loggingToolStripMenuItem
+            // 
+            this.loggingToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loggingEnableToolStripMenuItem,
+            this.viewLogToolStripMenuItem,
+            this.openLogWindowStripMenuItem,
+            this.loggingDebugToolStripMenuItem});
+            this.loggingToolStripMenuItem.Name = "loggingToolStripMenuItem";
+            this.loggingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loggingToolStripMenuItem.Text = "Logging";
+            // 
+            // loggingEnableToolStripMenuItem
+            // 
+            this.loggingEnableToolStripMenuItem.Checked = true;
+            this.loggingEnableToolStripMenuItem.CheckOnClick = true;
+            this.loggingEnableToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.loggingEnableToolStripMenuItem.Name = "loggingEnableToolStripMenuItem";
+            this.loggingEnableToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.loggingEnableToolStripMenuItem.Text = "Enable";
+            this.loggingEnableToolStripMenuItem.CheckedChanged += new System.EventHandler(this.loggingEnableToolStripMenuItem_CheckedChanged);
+            // 
+            // viewLogToolStripMenuItem
+            // 
+            this.viewLogToolStripMenuItem.Name = "viewLogToolStripMenuItem";
+            this.viewLogToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.viewLogToolStripMenuItem.Text = "Open log file";
+            this.viewLogToolStripMenuItem.Click += new System.EventHandler(this.viewLogToolStripMenuItem_Click);
+            // 
+            // openLogWindowStripMenuItem
+            // 
+            this.openLogWindowStripMenuItem.Name = "openLogWindowStripMenuItem";
+            this.openLogWindowStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.openLogWindowStripMenuItem.Text = "Open log window";
+            this.openLogWindowStripMenuItem.Click += new System.EventHandler(this.openLogWindowStripMenuItem_Click);
+            // 
+            // loggingDebugToolStripMenuItem
+            // 
+            this.loggingDebugToolStripMenuItem.Checked = true;
+            this.loggingDebugToolStripMenuItem.CheckOnClick = true;
+            this.loggingDebugToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.loggingDebugToolStripMenuItem.Name = "loggingDebugToolStripMenuItem";
+            this.loggingDebugToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.loggingDebugToolStripMenuItem.Text = "Debug logging";
+            this.loggingDebugToolStripMenuItem.CheckedChanged += new System.EventHandler(this.loggingDebugToolStripMenuItem_CheckedChanged);
             // 
             // LectureSelector
             // 
@@ -358,12 +333,8 @@
         private System.Windows.Forms.ToolStripMenuItem DropDownForceOffline;
         private System.Windows.Forms.ToolStripMenuItem loggingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewLogToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem verboseLogToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem enableToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem disableToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem enabledisableToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem enableToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem disableToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem loggingDebugToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loggingEnableToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openLogWindowStripMenuItem;
     }
 }

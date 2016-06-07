@@ -9,12 +9,22 @@ namespace VidLec
 {
     class Config
     {
-        public bool onlineMode = false;
+        /// <summary>
+        /// Static variables
+        /// </summary>
+        public static bool onlineMode = false;
+        public static bool loggingEnable = true;
+        public static bool loggingVerbose = true;
 
+        /// <summary>
+        /// Constants
+        /// Text, links, numbers & data
+        /// </summary>
         public static class Constants
         {
             const int statusWaitResetInterval = 800;
 
+            #region Text
             public const string onlineModeText = "Online mode activated";
             public const string offlineModeText = "Offline mode activated";
 
@@ -24,8 +34,15 @@ namespace VidLec
             public const string loadingDataText = "Getting data from server..";
             public const string loadedText = "Loaded successfully";
             public const string loadingErrorText = "Error loading folders..";
+            #endregion
+            #region Path and system variables
+            public const string logSubDir = "logs";
+            #endregion
         }
 
+        /// <summary>
+        /// Colors to be used
+        /// </summary>
         public static class AppColors
         {
             public static readonly Color ErrorText = Color.Red;
