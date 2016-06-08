@@ -22,16 +22,21 @@ namespace VidLec
     {
         private static LogForm logForm = new LogForm();
         private static Logger logger;
-        Comm comm = new Comm();
+        Comm comm;
         
         public LectureSelector()
         {
             InitializeComponent();
+            // Setup this form
             SetupListViews();
             SetFormSettings();
+            // Show log form before creating loggers
             logForm.Show();
+            // Create loggers
             logger = LogManager.GetCurrentClassLogger();
             logger.Debug("Created logger");
+            comm = new Comm();
+            // Handle network status
             Config.onlineMode = comm.CheckNet();
             ChangeNetworkStatus(true);
         }
@@ -139,6 +144,7 @@ namespace VidLec
         private void LectureSelector_Load(object sender, EventArgs e)
         {
             logger.Debug("Form loaded");
+            comm.test();
         }
 
         private void DropDownSetOnline_Click(object sender, EventArgs e)

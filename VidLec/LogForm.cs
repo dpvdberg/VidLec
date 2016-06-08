@@ -15,8 +15,8 @@ namespace VidLec
         private double backgroundOpacity = 0.4;
         public LogForm()
         {
-            InitializeComponent();
             this.Opacity = backgroundOpacity;
+            InitializeComponent();
         }
 
         private void LogForm_Activated(object sender, EventArgs e)

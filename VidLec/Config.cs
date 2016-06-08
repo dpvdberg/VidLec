@@ -16,6 +16,39 @@ namespace VidLec
         public static bool loggingEnable = true;
         public static bool loggingVerbose = true;
 
+        public static class UserData
+        {
+            public static string username = "test";
+            public static string password = "123";
+            public static string cookieData = "";
+        }
+
+        public static class SiteData
+        {
+            public const string loginURL = "http://videocollege.tue.nl/Mediasite/Login/";
+            public const string contentTypeHeader = "application/x-www-form-urlencoded";
+            public const string cookieFieldName = "MediasiteAuth";
+            public const string cookieHeaderName = "Set-Cookie";
+            public static Dictionary<string, string> loginPostParameters = new Dictionary<string, string>()
+            {
+                { "UserName", UserData.username},
+                { "Password", UserData.password},
+                { "RememberMe", "false"}
+            };
+
+            public static byte[] GetLoginPostData()
+            {
+                string postData = "";
+
+                foreach (KeyValuePair<string, string> parameter in loginPostParameters)
+                {
+                    postData += string.Format("{0}={1}&", parameter.Key, parameter.Value);
+                }
+
+                return Encoding.ASCII.GetBytes(postData.Trim('&'));
+            }
+        }
+
         /// <summary>
         /// Constants
         /// Text, links, numbers & data
