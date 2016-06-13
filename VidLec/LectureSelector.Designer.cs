@@ -44,15 +44,15 @@
             this.spacer = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
-            this.NetworkStatusStrip = new System.Windows.Forms.ToolStripMenuItem();
-            this.DropDownSetOnline = new System.Windows.Forms.ToolStripMenuItem();
-            this.DropDownForceOffline = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loggingEnableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openLogWindowStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loggingDebugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.NetworkStatusStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.DropDownSetOnline = new System.Windows.Forms.ToolStripMenuItem();
+            this.DropDownForceOffline = new System.Windows.Forms.ToolStripMenuItem();
             this.TLPSplit.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.olvPresentations)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tlvAll)).BeginInit();
@@ -208,30 +208,6 @@
             this.menuStrip.TabIndex = 2;
             this.menuStrip.Text = "menuStrip";
             // 
-            // NetworkStatusStrip
-            // 
-            this.NetworkStatusStrip.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.NetworkStatusStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.DropDownSetOnline,
-            this.DropDownForceOffline});
-            this.NetworkStatusStrip.Name = "NetworkStatusStrip";
-            this.NetworkStatusStrip.Size = new System.Drawing.Size(98, 20);
-            this.NetworkStatusStrip.Text = "Network status";
-            // 
-            // DropDownSetOnline
-            // 
-            this.DropDownSetOnline.Name = "DropDownSetOnline";
-            this.DropDownSetOnline.Size = new System.Drawing.Size(143, 22);
-            this.DropDownSetOnline.Text = "Check online";
-            this.DropDownSetOnline.Click += new System.EventHandler(this.DropDownSetOnline_Click);
-            // 
-            // DropDownForceOffline
-            // 
-            this.DropDownForceOffline.Name = "DropDownForceOffline";
-            this.DropDownForceOffline.Size = new System.Drawing.Size(143, 22);
-            this.DropDownForceOffline.Text = "Force offline";
-            this.DropDownForceOffline.Click += new System.EventHandler(this.DropDownForceOffline_Click);
-            // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -248,7 +224,7 @@
             this.openLogWindowStripMenuItem,
             this.loggingDebugToolStripMenuItem});
             this.loggingToolStripMenuItem.Name = "loggingToolStripMenuItem";
-            this.loggingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loggingToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
             this.loggingToolStripMenuItem.Text = "Logging";
             // 
             // loggingEnableToolStripMenuItem
@@ -285,6 +261,30 @@
             this.loggingDebugToolStripMenuItem.Text = "Debug logging";
             this.loggingDebugToolStripMenuItem.CheckedChanged += new System.EventHandler(this.loggingDebugToolStripMenuItem_CheckedChanged);
             // 
+            // NetworkStatusStrip
+            // 
+            this.NetworkStatusStrip.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.NetworkStatusStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.DropDownSetOnline,
+            this.DropDownForceOffline});
+            this.NetworkStatusStrip.Name = "NetworkStatusStrip";
+            this.NetworkStatusStrip.Size = new System.Drawing.Size(98, 20);
+            this.NetworkStatusStrip.Text = "Network status";
+            // 
+            // DropDownSetOnline
+            // 
+            this.DropDownSetOnline.Name = "DropDownSetOnline";
+            this.DropDownSetOnline.Size = new System.Drawing.Size(143, 22);
+            this.DropDownSetOnline.Text = "Check online";
+            this.DropDownSetOnline.Click += new System.EventHandler(this.DropDownSetOnline_Click);
+            // 
+            // DropDownForceOffline
+            // 
+            this.DropDownForceOffline.Name = "DropDownForceOffline";
+            this.DropDownForceOffline.Size = new System.Drawing.Size(143, 22);
+            this.DropDownForceOffline.Text = "Force offline";
+            this.DropDownForceOffline.Click += new System.EventHandler(this.DropDownForceOffline_Click);
+            // 
             // LectureSelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -298,6 +298,7 @@
             this.Name = "LectureSelector";
             this.Text = "LectureSelector";
             this.Load += new System.EventHandler(this.LectureSelector_Load);
+            this.Shown += new System.EventHandler(this.LectureSelector_Shown);
             this.TLPSplit.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.olvPresentations)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tlvAll)).EndInit();

@@ -7,20 +7,14 @@ using System.Threading.Tasks;
 
 namespace VidLec
 {
-    class Config
+    class AppConfig
     {
-        /// <summary>
-        /// Static variables
-        /// </summary>
-        public static bool onlineMode = false;
-        public static bool loggingEnable = true;
-        public static bool loggingVerbose = true;
-
-        public static class UserData
+        public static class AppInstance
         {
-            public static string username = "test";
-            public static string password = "123";
+            public static bool onlineMode = false;
             public static string cookieData = "";
+            public static string username = "";
+            public static string password = "";
         }
 
         public static class SiteData
@@ -31,8 +25,8 @@ namespace VidLec
             public const string cookieHeaderName = "Set-Cookie";
             public static Dictionary<string, string> loginPostParameters = new Dictionary<string, string>()
             {
-                { "UserName", UserData.username},
-                { "Password", UserData.password},
+                { "UserName", AppInstance.username},
+                { "Password", AppInstance.password},
                 { "RememberMe", "false"}
             };
 

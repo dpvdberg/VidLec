@@ -39,20 +39,29 @@ namespace VidLec
         }
         #endregion
 
-        public void test()
+        public bool Login(string username, string password, bool remember, bool saveCookie)
         {
-            bool bla = SetLoginCookie();
-            Console.WriteLine(bla.ToString());
+            if (remember)
+            {
+                Properties.Settings.Default.Username = username;
+                Properties.Settings.Default.password = password;
+                Properties.Settings.Default.Save();
+            }
+
+            AppConfig.AppInstance.username = username;
+            AppConfig.AppInstance.password = password;
+
+            return SetLoginCookie(saveCookie);
         }
         
-        public bool SetLoginCookie()
+        private bool SetLoginCookie(bool saveCookie)
         {
-            HttpWebRequest webRequest = (HttpWebRequest) WebRequest.Create(Config.SiteData.loginURL);
-            byte[] postData = Config.SiteData.GetLoginPostData();
+            HttpWebRequest webRequest = (HttpWebRequest) WebRequest.Create(AppConfig.SiteData.loginURL);
+            byte[] postData = AppConfig.SiteData.GetLoginPostData();
 
             webRequest.Method = "POST";
             webRequest.ContentLength = postData.Length;
-            webRequest.ContentType = Config.SiteData.contentTypeHeader;
+            webRequest.ContentType = AppConfig.SiteData.contentTypeHeader;
             // Make sure we do not redirect, cookie can be found in redirect
             // This will also improve performance
             webRequest.AllowAutoRedirect = false;
@@ -65,10 +74,10 @@ namespace VidLec
             HttpWebResponse myResp = (HttpWebResponse)webRequest.GetResponse();
             if (myResp.StatusCode == HttpStatusCode.Redirect)
             {
-                string[] setCookieHeader = myResp.Headers.GetValues(Config.SiteData.cookieHeaderName);
+                string[] setCookieHeader = myResp.Headers.GetValues(AppConfig.SiteData.cookieHeaderName);
                 if (setCookieHeader != null)
                 {
-                    string loginCookie = setCookieHeader.FirstOrDefault(p => p.Contains(Config.SiteData.cookieFieldName));
+                    string loginCookie = setCookieHeader.FirstOrDefault(p => p.Contains(AppConfig.SiteData.cookieFieldName));
                     if (loginCookie == default(string))
                     {
                         logger.Error("Login field in header was not found");
@@ -76,7 +85,12 @@ namespace VidLec
                     }
                     else
                     {
-                        Config.UserData.cookieData = loginCookie;
+                        AppConfig.AppInstance.cookieData = loginCookie;
+                        if (saveCookie)
+                        {
+                            Properties.Settings.Default.loginCookieData = loginCookie;
+                            Properties.Settings.Default.Save();
+                        }
                         logger.Debug(string.Format("Found loginCookie:\n{0}", loginCookie));
                         return true;
                     }

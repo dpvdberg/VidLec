@@ -27,18 +27,21 @@ namespace VidLec
         public LectureSelector()
         {
             InitializeComponent();
+            if (Properties.Settings.Default.loggingEnable)
+            {
+                // Show log form before creating loggers
+                logForm.Show();
+                // Create loggers
+                logger = LogManager.GetCurrentClassLogger();
+                logger.Debug("Created logger");
+            }
             // Setup this form
             SetupListViews();
-            SetFormSettings();
-            // Show log form before creating loggers
-            logForm.Show();
-            // Create loggers
-            logger = LogManager.GetCurrentClassLogger();
-            logger.Debug("Created logger");
+            SetFormSettings();            
             comm = new Comm();
             // Handle network status
-            Config.onlineMode = comm.CheckNet();
-            ChangeNetworkStatus(true);
+            AppConfig.AppInstance.onlineMode = comm.CheckNet();
+            ChangeNetworkStatus(!Properties.Settings.Default.OfflineByDefault);
         }
 
         /// <summary>
@@ -46,8 +49,23 @@ namespace VidLec
         /// </summary>
         private void SetFormSettings()
         {
-            loggingDebugToolStripMenuItem.Checked = Config.loggingVerbose;
-            loggingEnableToolStripMenuItem.Checked = Config.loggingEnable;
+            loggingDebugToolStripMenuItem.Checked = Properties.Settings.Default.loggingVerbose;
+            loggingEnableToolStripMenuItem.Checked = Properties.Settings.Default.loggingEnable;
+        }
+
+        /// <summary>
+        /// Make sure the user is logged in
+        /// i.e. we have a cookie or username + password
+        /// </summary>
+        private void EnsureLogin()
+        {
+            if ((Properties.Settings.Default.Username == "" || Properties.Settings.Default.password == "") &&
+                Properties.Settings.Default.loginCookieData == "" && AppConfig.AppInstance.onlineMode)
+            {
+                logger.Info("Online mode and no credentials or cookie data saved, asking for login..");
+                SetStatus("Asking for login", AppConfig.AppColors.BlueText);
+                (new LoginForm(this)).Show();
+            }
         }
 
         /// <summary>
@@ -113,23 +131,23 @@ namespace VidLec
             {
                 if (comm.CheckNet())
                 {
-                    Config.onlineMode = true;
+                    AppConfig.AppInstance.onlineMode = true;
                     logger.Info("Connected to the internet");
-                    SetStatus(Config.Constants.onlineModeText, Config.AppColors.OKText);
+                    SetStatus(AppConfig.Constants.onlineModeText, AppConfig.AppColors.OKText);
                 }
                 else
                 {
-                    Config.onlineMode = false;
+                    AppConfig.AppInstance.onlineMode = false;
                     logger.Info("Cannot connect to the internet");
-                    SetStatus(Config.Constants.offlineModeText, Config.AppColors.BlueText);
+                    SetStatus(AppConfig.Constants.offlineModeText, AppConfig.AppColors.BlueText);
                 }
             }
             // Force offline
             else
             {
-                Config.onlineMode = false;
+                AppConfig.AppInstance.onlineMode = false;
                 logger.Info("Offline mode activated");
-                SetStatus(Config.Constants.offlineModeText, Config.AppColors.BlueText);
+                SetStatus(AppConfig.Constants.offlineModeText, AppConfig.AppColors.BlueText);
             }
         }
 
@@ -144,7 +162,6 @@ namespace VidLec
         private void LectureSelector_Load(object sender, EventArgs e)
         {
             logger.Debug("Form loaded");
-            comm.test();
         }
 
         private void DropDownSetOnline_Click(object sender, EventArgs e)
@@ -179,8 +196,7 @@ namespace VidLec
                 logForm.Focus();
                 LogManager.EnableLogging();
                 logger.Info("Logging enabled");
-            } else
-            {
+            } else {
                 logForm.Hide();
                 LogManager.DisableLogging();
             }
@@ -190,10 +206,15 @@ namespace VidLec
         {
             string logFilePath = Path.Combine(Path.GetTempPath(),
                 ((Type)typeof(LectureSelector)).Namespace,
-                Config.Constants.logSubDir,
+                AppConfig.Constants.logSubDir,
                 SimpleLayout.Evaluate(LogManager.Configuration.Variables["currentDate"].Text) + SimpleLayout.Evaluate(LogManager.Configuration.Variables["logFileExtension"].Text));
             logger.Debug(string.Format("Trying to open logfile located at \"{0}\"", logFilePath));
             Process.Start(logFilePath);
+        }
+
+        private void LectureSelector_Shown(object sender, EventArgs e)
+        {
+            EnsureLogin();
         }
 
         #endregion
