@@ -38,48 +38,48 @@ namespace VidLec.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string password {
+        public string Password {
             get {
-                return ((string)(this["password"]));
+                return ((string)(this["Password"]));
             }
             set {
-                this["password"] = value;
+                this["Password"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool loggingVerbose {
+        public bool LoggingVerbose {
             get {
-                return ((bool)(this["loggingVerbose"]));
+                return ((bool)(this["LoggingVerbose"]));
             }
             set {
-                this["loggingVerbose"] = value;
+                this["LoggingVerbose"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool loggingEnable {
+        public bool LoggingEnable {
             get {
-                return ((bool)(this["loggingEnable"]));
+                return ((bool)(this["LoggingEnable"]));
             }
             set {
-                this["loggingEnable"] = value;
+                this["LoggingEnable"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string loginCookieData {
+        public string LoginCookieData {
             get {
-                return ((string)(this["loginCookieData"]));
+                return ((string)(this["LoginCookieData"]));
             }
             set {
-                this["loginCookieData"] = value;
+                this["LoginCookieData"] = value;
             }
         }
         
@@ -92,6 +92,18 @@ namespace VidLec.Properties {
             }
             set {
                 this["OfflineByDefault"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SaveCookies {
+            get {
+                return ((bool)(this["SaveCookies"]));
+            }
+            set {
+                this["SaveCookies"] = value;
             }
         }
     }

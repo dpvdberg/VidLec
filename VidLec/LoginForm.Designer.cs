@@ -36,6 +36,7 @@
             this.chkSaveCookie = new System.Windows.Forms.CheckBox();
             this.btnLogin = new System.Windows.Forms.Button();
             this.lblLoginStatus = new System.Windows.Forms.Label();
+            this.bgwLogin = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // lblUsername
@@ -86,6 +87,8 @@
             // chkSaveCookie
             // 
             this.chkSaveCookie.AutoSize = true;
+            this.chkSaveCookie.Checked = true;
+            this.chkSaveCookie.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSaveCookie.Location = new System.Drawing.Point(12, 89);
             this.chkSaveCookie.Name = "chkSaveCookie";
             this.chkSaveCookie.Size = new System.Drawing.Size(86, 17);
@@ -111,6 +114,11 @@
             this.lblLoginStatus.Size = new System.Drawing.Size(187, 18);
             this.lblLoginStatus.TabIndex = 6;
             // 
+            // bgwLogin
+            // 
+            this.bgwLogin.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwLogin_DoWork);
+            this.bgwLogin.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwLogin_RunWorkerCompleted);
+            // 
             // LoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -127,6 +135,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "LoginForm";
             this.Text = "LoginForm";
+            this.Load += new System.EventHandler(this.LoginForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -142,5 +151,6 @@
         private System.Windows.Forms.CheckBox chkSaveCookie;
         private System.Windows.Forms.Button btnLogin;
         private System.Windows.Forms.Label lblLoginStatus;
+        private System.ComponentModel.BackgroundWorker bgwLogin;
     }
 }

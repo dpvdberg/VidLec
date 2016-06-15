@@ -55,10 +55,11 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Comm.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="AppConfig.cs" />
     <Compile Include="Folder.cs" />
     <Compile Include="LectureSelector.cs">
       <SubType>Form</SubType>

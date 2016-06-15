@@ -1,20 +1,16 @@
 ﻿using NLog;
 using NLog.Config;
 using NLog.Layouts;
-using NLog.Targets;
-using NLog.Windows.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Threading;
 
 namespace VidLec
 {
@@ -27,13 +23,12 @@ namespace VidLec
         public LectureSelector()
         {
             InitializeComponent();
-            if (Properties.Settings.Default.loggingEnable)
+            if (Properties.Settings.Default.LoggingEnable)
             {
                 // Show log form before creating loggers
                 logForm.Show();
                 // Create loggers
                 logger = LogManager.GetCurrentClassLogger();
-                logger.Debug("Created logger");
             }
             // Setup this form
             SetupListViews();
@@ -41,7 +36,6 @@ namespace VidLec
             comm = new Comm();
             // Handle network status
             AppConfig.AppInstance.onlineMode = comm.CheckNet();
-            ChangeNetworkStatus(!Properties.Settings.Default.OfflineByDefault);
         }
 
         /// <summary>
@@ -49,27 +43,83 @@ namespace VidLec
         /// </summary>
         private void SetFormSettings()
         {
-            loggingDebugToolStripMenuItem.Checked = Properties.Settings.Default.loggingVerbose;
-            loggingEnableToolStripMenuItem.Checked = Properties.Settings.Default.loggingEnable;
+            loggingDebugToolStripMenuItem.Checked = Properties.Settings.Default.LoggingVerbose;
+            loggingEnableToolStripMenuItem.Checked = Properties.Settings.Default.LoggingEnable;
+            saveCookiesToolStripMenuItem.Checked = Properties.Settings.Default.SaveCookies;
+            offlineByDefaultToolStripMenuItem.Checked = Properties.Settings.Default.OfflineByDefault;
         }
+
+        private enum LoginResult
+        {
+            COOKIE_OK,
+            COOKIE_FAIL,
+            CREDENTIALS_OK,
+            CREDENTIALS_FAIL,
+            NOTHINGSAVED,
+            COULD_NOT_GET_CATALOG
+        } 
 
         /// <summary>
         /// Make sure the user is logged in
-        /// i.e. we have a cookie or username + password
+        /// i.e. we have a valid cookie
+        /// 
+        /// Expects the user to be online
         /// </summary>
-        private void EnsureLogin()
+        private void EnsureLogin(BackgroundWorker bg, ref DoWorkEventArgs e)
         {
-            if ((Properties.Settings.Default.Username == "" || Properties.Settings.Default.password == "") &&
-                Properties.Settings.Default.loginCookieData == "" && AppConfig.AppInstance.onlineMode)
+            bg.ReportProgress(10);
+            if (comm.SetCatalogURL())
             {
-                logger.Info("Online mode and no credentials or cookie data saved, asking for login..");
-                SetStatus("Asking for login", AppConfig.AppColors.BlueText);
-                (new LoginForm(this)).Show();
+                bg.ReportProgress(60);
+                if (Properties.Settings.Default.LoginCookieData != "")
+                {
+                    AppConfig.AppInstance.cookieData = Properties.Settings.Default.LoginCookieData;
+                    if (comm.ValidateCookie())
+                    {
+                        logger.Debug("Comm login using cookie successful");
+                        e.Result = LoginResult.COOKIE_OK;
+                    }
+                    else
+                    {
+                        logger.Debug("Comm returned false cookie flag, erasing cookie data and retrying login procedure..");
+                        Properties.Settings.Default.LoginCookieData = "";
+                        Properties.Settings.Default.Save();
+                        e.Result = LoginResult.COOKIE_FAIL;
+                    }
+                }
+                else if (Properties.Settings.Default.Username != "" && Properties.Settings.Default.Password != "")
+                {
+                    logger.Debug("Found saved credentials");
+                    if (comm.Login(Properties.Settings.Default.Username,
+                        Properties.Settings.Default.Password,
+                        true,
+                        Properties.Settings.Default.SaveCookies))
+                    {
+                        logger.Debug("Logged in using credentials");
+                        e.Result = LoginResult.CREDENTIALS_OK;
+                    }
+                    else
+                    {
+                        logger.Info("credentials invalid, could not log in");
+                        e.Result = LoginResult.CREDENTIALS_FAIL;
+                    }
+                }
+                else
+                {
+                    logger.Info("Online mode and no credentials or cookie data saved, asking for login..");
+                    e.Result = LoginResult.NOTHINGSAVED;
+                }
             }
+            else
+            {
+                logger.Error("Getting catalog URL failed, aborting login..");
+                e.Result = LoginResult.COULD_NOT_GET_CATALOG;
+            }
+            bg.ReportProgress(100);
         }
 
         /// <summary>
-        /// Sets the logger config
+        /// Enables or disables a specific log level in the logform logbox
         /// </summary>
         private void SetBoxLoggingLevel(LogLevel level, bool enable)
         {
@@ -133,7 +183,8 @@ namespace VidLec
                 {
                     AppConfig.AppInstance.onlineMode = true;
                     logger.Info("Connected to the internet");
-                    SetStatus(AppConfig.Constants.onlineModeText, AppConfig.AppColors.OKText);
+                    SetStatus(AppConfig.Constants.loggingInText, AppConfig.AppColors.OKText);
+                    bgwLogin.RunWorkerAsync();
                 }
                 else
                 {
@@ -157,6 +208,18 @@ namespace VidLec
             toolStripStatusLabel.Text = status;
         }
 
+        public void SetProgress(int percentage)
+        {
+            statusStrip.Invoke(new Action(() => toolStripProgressBar.Value = percentage));
+            if (percentage == 100)
+            {
+                new Thread(delegate () {
+                    Thread.Sleep(1000);
+                    SetProgress(0);
+                }).Start();
+            }
+        }
+
         #region GUI events
 
         private void LectureSelector_Load(object sender, EventArgs e)
@@ -175,31 +238,10 @@ namespace VidLec
         }
 
 
-        private void loggingDebugToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
-        { 
-            SetBoxLoggingLevel(LogLevel.Debug, loggingDebugToolStripMenuItem.Checked);
-            logger.Debug(string.Format("Debug logging set to: {0}", loggingDebugToolStripMenuItem.Checked));
-        }
-
-
         private void openLogWindowStripMenuItem_Click(object sender, EventArgs e)
         {
             logForm.Show();
             logForm.Focus();
-        }
-
-        private void loggingEnableToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
-        {
-            if (loggingEnableToolStripMenuItem.Checked)
-            {
-                logForm.Show();
-                logForm.Focus();
-                LogManager.EnableLogging();
-                logger.Info("Logging enabled");
-            } else {
-                logForm.Hide();
-                LogManager.DisableLogging();
-            }
         }
 
         private void viewLogToolStripMenuItem_Click(object sender, EventArgs e)
@@ -214,7 +256,101 @@ namespace VidLec
 
         private void LectureSelector_Shown(object sender, EventArgs e)
         {
-            EnsureLogin();
+            ChangeNetworkStatus(!Properties.Settings.Default.OfflineByDefault);
+        }
+
+        private void saveCookiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.SaveCookies = saveCookiesToolStripMenuItem.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void loggingDebugToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            SetBoxLoggingLevel(LogLevel.Debug, loggingDebugToolStripMenuItem.Checked);
+            logger.Debug(string.Format("Debug logging set to: {0}", loggingDebugToolStripMenuItem.Checked));
+            Properties.Settings.Default.LoggingVerbose = loggingDebugToolStripMenuItem.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void loggingEnableToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (loggingEnableToolStripMenuItem.Checked)
+            {
+                logForm.Show();
+                logForm.Focus();
+                LogManager.EnableLogging();
+                logger.Info("Logging enabled");
+            }
+            else
+            {
+                logForm.Hide();
+                LogManager.DisableLogging();
+            }
+            Properties.Settings.Default.LoggingEnable = loggingEnableToolStripMenuItem.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+
+        private void offlineByDefaultToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.OfflineByDefault = offlineByDefaultToolStripMenuItem.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void deleteSavedCookiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.LoginCookieData = "";
+            Properties.Settings.Default.Save();
+        }
+
+        private void deleteSavedCredentailsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Username = "";
+            Properties.Settings.Default.Password = "";
+            Properties.Settings.Default.Save();
+        }
+
+        private void resetAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Reset();
+            SetFormSettings();
+            logger.Info("Reset all settings to default");
+        }
+        #endregion
+
+        #region Background workers/threads
+        private void bgwLogin_DoWork(object sender, DoWorkEventArgs e)
+        {
+            EnsureLogin(bgwLogin, ref e);
+        }
+
+        private void bgwLogin_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        { 
+            switch ((LoginResult) e.Result)
+            {
+                case LoginResult.COOKIE_OK:
+                case LoginResult.CREDENTIALS_OK:
+                    SetStatus(AppConfig.Constants.loggedIn, AppConfig.AppColors.OKText);
+                    break;
+                case LoginResult.COOKIE_FAIL:
+                    logger.Debug("Failed to log in, retrying..");
+                    bgwLogin.RunWorkerAsync();
+                    break;
+                case LoginResult.CREDENTIALS_FAIL:
+                case LoginResult.NOTHINGSAVED:
+                    SetStatus("Asking for login", AppConfig.AppColors.BlueText);
+                    (new LoginForm(this)).Show();
+                    break;
+                case LoginResult.COULD_NOT_GET_CATALOG:
+                    SetStatus(AppConfig.Constants.serverError, AppConfig.AppColors.ErrorText);
+                    break;
+            }
+        }
+
+        private void bgwLogin_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            SetProgress(e.ProgressPercentage);
         }
 
         #endregion

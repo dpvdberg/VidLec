@@ -12,17 +12,34 @@ namespace VidLec
         public static class AppInstance
         {
             public static bool onlineMode = false;
+            public static bool cookieValid = false;
             public static string cookieData = "";
             public static string username = "";
             public static string password = "";
+
+            public static string catalogURL = "";
+            public static string catalogId = "";
         }
 
         public static class SiteData
         {
-            public const string loginURL = "http://videocollege.tue.nl/Mediasite/Login/";
+            /// <summary>
+            /// URL constants
+            /// </summary>
+            public const string baseURL = "http://videocollege.tue.nl";
+            public const string loginURL = baseURL + "/Mediasite/Login/";
+
+            // Redirect (302) header name
+            public const string redirectHeaderName = "Location";
+
+            /// <summary>
+            /// Login related constants
+            /// </summary>
             public const string contentTypeHeader = "application/x-www-form-urlencoded";
             public const string cookieFieldName = "MediasiteAuth";
             public const string cookieHeaderName = "Set-Cookie";
+            public const string validCookieMagicKeyword = "Authenticated=\"True\"";
+            public const string catalogFieldName = "CatalogId";
             public static Dictionary<string, string> loginPostParameters = new Dictionary<string, string>()
             {
                 { "UserName", AppInstance.username},
@@ -41,6 +58,18 @@ namespace VidLec
 
                 return Encoding.ASCII.GetBytes(postData.Trim('&'));
             }
+
+            public static string GetCookieValue(string cookieName, string data)
+            {
+                try {
+                    string cookieKeyWord = cookieName + "=";
+                    int startIndex = data.IndexOf(cookieKeyWord) + cookieKeyWord.Length;
+                    return data.Substring(startIndex, data.IndexOf(';', startIndex) - startIndex);
+                } catch (Exception)
+                {
+                    return "";
+                }
+            }
         }
 
         /// <summary>
@@ -52,7 +81,9 @@ namespace VidLec
             const int statusWaitResetInterval = 800;
 
             #region Text
-            public const string onlineModeText = "Online mode activated";
+            public const string loggingInText = "Logging in..";
+            public const string loggedIn = "Logged in";
+            public const string serverError = "Server error";
             public const string offlineModeText = "Offline mode activated";
 
             public const string noConnectionText = "No network connection available, entering offline mode..";
