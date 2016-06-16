@@ -46,23 +46,26 @@
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loggingDebugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loggingEnableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.viewLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openLogWindowStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loggingDebugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.accountSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.NetworkStatusStrip = new System.Windows.Forms.ToolStripMenuItem();
-            this.DropDownSetOnline = new System.Windows.Forms.ToolStripMenuItem();
-            this.DropDownForceOffline = new System.Windows.Forms.ToolStripMenuItem();
-            this.bgwLogin = new System.ComponentModel.BackgroundWorker();
+            this.accountToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveCookiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteSavedCookiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteSavedCredentailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.serverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveCatalogDetailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.NetworkStatusStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.DropDownSetOnline = new System.Windows.Forms.ToolStripMenuItem();
+            this.DropDownForceOffline = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.offlineByDefaultToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bgwLogin = new System.ComponentModel.BackgroundWorker();
+            this.bgwCatalogLoader = new System.ComponentModel.BackgroundWorker();
             this.TLPSplit.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.olvPresentations)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tlvAll)).BeginInit();
@@ -222,7 +225,8 @@
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loggingToolStripMenuItem,
-            this.accountSettingsToolStripMenuItem});
+            this.accountToolStripMenuItem,
+            this.serverToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
@@ -236,8 +240,18 @@
             this.viewLogToolStripMenuItem,
             this.openLogWindowStripMenuItem});
             this.loggingToolStripMenuItem.Name = "loggingToolStripMenuItem";
-            this.loggingToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.loggingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.loggingToolStripMenuItem.Text = "Logging";
+            // 
+            // loggingDebugToolStripMenuItem
+            // 
+            this.loggingDebugToolStripMenuItem.Checked = true;
+            this.loggingDebugToolStripMenuItem.CheckOnClick = true;
+            this.loggingDebugToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.loggingDebugToolStripMenuItem.Name = "loggingDebugToolStripMenuItem";
+            this.loggingDebugToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.loggingDebugToolStripMenuItem.Text = "Debug logging";
+            this.loggingDebugToolStripMenuItem.CheckedChanged += new System.EventHandler(this.loggingDebugToolStripMenuItem_CheckedChanged);
             // 
             // loggingEnableToolStripMenuItem
             // 
@@ -248,6 +262,11 @@
             this.loggingEnableToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.loggingEnableToolStripMenuItem.Text = "Enable";
             this.loggingEnableToolStripMenuItem.CheckedChanged += new System.EventHandler(this.loggingEnableToolStripMenuItem_CheckedChanged);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(165, 6);
             // 
             // viewLogToolStripMenuItem
             // 
@@ -263,27 +282,67 @@
             this.openLogWindowStripMenuItem.Text = "Open log window";
             this.openLogWindowStripMenuItem.Click += new System.EventHandler(this.openLogWindowStripMenuItem_Click);
             // 
-            // loggingDebugToolStripMenuItem
+            // accountToolStripMenuItem
             // 
-            this.loggingDebugToolStripMenuItem.Checked = true;
-            this.loggingDebugToolStripMenuItem.CheckOnClick = true;
-            this.loggingDebugToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.loggingDebugToolStripMenuItem.Name = "loggingDebugToolStripMenuItem";
-            this.loggingDebugToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.loggingDebugToolStripMenuItem.Text = "Debug logging";
-            this.loggingDebugToolStripMenuItem.CheckedChanged += new System.EventHandler(this.loggingDebugToolStripMenuItem_CheckedChanged);
-            // 
-            // accountSettingsToolStripMenuItem
-            // 
-            this.accountSettingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.accountToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveCookiesToolStripMenuItem,
             this.toolStripSeparator1,
             this.deleteSavedCookiesToolStripMenuItem,
             this.deleteSavedCredentailsToolStripMenuItem,
             this.resetAllToolStripMenuItem});
-            this.accountSettingsToolStripMenuItem.Name = "accountSettingsToolStripMenuItem";
-            this.accountSettingsToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-            this.accountSettingsToolStripMenuItem.Text = "Account settings";
+            this.accountToolStripMenuItem.Name = "accountToolStripMenuItem";
+            this.accountToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.accountToolStripMenuItem.Text = "Account";
+            // 
+            // saveCookiesToolStripMenuItem
+            // 
+            this.saveCookiesToolStripMenuItem.CheckOnClick = true;
+            this.saveCookiesToolStripMenuItem.Name = "saveCookiesToolStripMenuItem";
+            this.saveCookiesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.saveCookiesToolStripMenuItem.Text = "Save cookies";
+            this.saveCookiesToolStripMenuItem.CheckedChanged += new System.EventHandler(this.saveCookiesToolStripMenuItem_CheckedChanged);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(197, 6);
+            // 
+            // deleteSavedCookiesToolStripMenuItem
+            // 
+            this.deleteSavedCookiesToolStripMenuItem.Name = "deleteSavedCookiesToolStripMenuItem";
+            this.deleteSavedCookiesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.deleteSavedCookiesToolStripMenuItem.Text = "Delete saved cookies";
+            this.deleteSavedCookiesToolStripMenuItem.CheckedChanged += new System.EventHandler(this.deleteSavedCookiesToolStripMenuItem_CheckedChanged);
+            // 
+            // deleteSavedCredentailsToolStripMenuItem
+            // 
+            this.deleteSavedCredentailsToolStripMenuItem.Name = "deleteSavedCredentailsToolStripMenuItem";
+            this.deleteSavedCredentailsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.deleteSavedCredentailsToolStripMenuItem.Text = "Delete saved credentails";
+            this.deleteSavedCredentailsToolStripMenuItem.Click += new System.EventHandler(this.deleteSavedCredentailsToolStripMenuItem_Click);
+            // 
+            // resetAllToolStripMenuItem
+            // 
+            this.resetAllToolStripMenuItem.Name = "resetAllToolStripMenuItem";
+            this.resetAllToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.resetAllToolStripMenuItem.Text = "Reset all";
+            this.resetAllToolStripMenuItem.Click += new System.EventHandler(this.resetAllToolStripMenuItem_Click);
+            // 
+            // serverToolStripMenuItem
+            // 
+            this.serverToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveCatalogDetailsToolStripMenuItem});
+            this.serverToolStripMenuItem.Name = "serverToolStripMenuItem";
+            this.serverToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.serverToolStripMenuItem.Text = "Server";
+            // 
+            // saveCatalogDetailsToolStripMenuItem
+            // 
+            this.saveCatalogDetailsToolStripMenuItem.CheckOnClick = true;
+            this.saveCatalogDetailsToolStripMenuItem.Name = "saveCatalogDetailsToolStripMenuItem";
+            this.saveCatalogDetailsToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.saveCatalogDetailsToolStripMenuItem.Text = "Save catalog details";
+            this.saveCatalogDetailsToolStripMenuItem.CheckedChanged += new System.EventHandler(this.saveCatalogDetailsToolStripMenuItem_CheckedChanged);
             // 
             // NetworkStatusStrip
             // 
@@ -300,62 +359,16 @@
             // DropDownSetOnline
             // 
             this.DropDownSetOnline.Name = "DropDownSetOnline";
-            this.DropDownSetOnline.Size = new System.Drawing.Size(143, 22);
+            this.DropDownSetOnline.Size = new System.Drawing.Size(166, 22);
             this.DropDownSetOnline.Text = "Check online";
             this.DropDownSetOnline.Click += new System.EventHandler(this.DropDownSetOnline_Click);
             // 
             // DropDownForceOffline
             // 
             this.DropDownForceOffline.Name = "DropDownForceOffline";
-            this.DropDownForceOffline.Size = new System.Drawing.Size(143, 22);
+            this.DropDownForceOffline.Size = new System.Drawing.Size(166, 22);
             this.DropDownForceOffline.Text = "Force offline";
             this.DropDownForceOffline.Click += new System.EventHandler(this.DropDownForceOffline_Click);
-            // 
-            // bgwLogin
-            // 
-            this.bgwLogin.WorkerReportsProgress = true;
-            this.bgwLogin.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwLogin_DoWork);
-            this.bgwLogin.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgwLogin_ProgressChanged);
-            this.bgwLogin.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwLogin_RunWorkerCompleted);
-            // 
-            // saveCookiesToolStripMenuItem
-            // 
-            this.saveCookiesToolStripMenuItem.CheckOnClick = true;
-            this.saveCookiesToolStripMenuItem.Name = "saveCookiesToolStripMenuItem";
-            this.saveCookiesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
-            this.saveCookiesToolStripMenuItem.Text = "Save cookies";
-            this.saveCookiesToolStripMenuItem.Click += new System.EventHandler(this.saveCookiesToolStripMenuItem_Click);
-            // 
-            // deleteSavedCookiesToolStripMenuItem
-            // 
-            this.deleteSavedCookiesToolStripMenuItem.Name = "deleteSavedCookiesToolStripMenuItem";
-            this.deleteSavedCookiesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
-            this.deleteSavedCookiesToolStripMenuItem.Text = "Delete saved cookies";
-            this.deleteSavedCookiesToolStripMenuItem.Click += new System.EventHandler(this.deleteSavedCookiesToolStripMenuItem_Click);
-            // 
-            // deleteSavedCredentailsToolStripMenuItem
-            // 
-            this.deleteSavedCredentailsToolStripMenuItem.Name = "deleteSavedCredentailsToolStripMenuItem";
-            this.deleteSavedCredentailsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
-            this.deleteSavedCredentailsToolStripMenuItem.Text = "Delete saved credentails";
-            this.deleteSavedCredentailsToolStripMenuItem.Click += new System.EventHandler(this.deleteSavedCredentailsToolStripMenuItem_Click);
-            // 
-            // resetAllToolStripMenuItem
-            // 
-            this.resetAllToolStripMenuItem.Name = "resetAllToolStripMenuItem";
-            this.resetAllToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
-            this.resetAllToolStripMenuItem.Text = "Reset all";
-            this.resetAllToolStripMenuItem.Click += new System.EventHandler(this.resetAllToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(197, 6);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(165, 6);
             // 
             // toolStripSeparator3
             // 
@@ -368,7 +381,19 @@
             this.offlineByDefaultToolStripMenuItem.Name = "offlineByDefaultToolStripMenuItem";
             this.offlineByDefaultToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.offlineByDefaultToolStripMenuItem.Text = "Offline by default";
-            this.offlineByDefaultToolStripMenuItem.Click += new System.EventHandler(this.offlineByDefaultToolStripMenuItem_Click);
+            this.offlineByDefaultToolStripMenuItem.CheckedChanged += new System.EventHandler(this.offlineByDefaultToolStripMenuItem_CheckedChanged);
+            // 
+            // bgwLogin
+            // 
+            this.bgwLogin.WorkerReportsProgress = true;
+            this.bgwLogin.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwLogin_DoWork);
+            this.bgwLogin.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgwLogin_ProgressChanged);
+            this.bgwLogin.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwLogin_RunWorkerCompleted);
+            // 
+            // bgwCatalogLoader
+            // 
+            this.bgwCatalogLoader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwCatalogLoader_DoWork);
+            this.bgwCatalogLoader.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwCatalogLoader_RunWorkerCompleted);
             // 
             // LectureSelector
             // 
@@ -423,7 +448,7 @@
         private System.Windows.Forms.ToolStripMenuItem loggingEnableToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openLogWindowStripMenuItem;
         public System.ComponentModel.BackgroundWorker bgwLogin;
-        private System.Windows.Forms.ToolStripMenuItem accountSettingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem accountToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem saveCookiesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
@@ -432,5 +457,8 @@
         private System.Windows.Forms.ToolStripMenuItem resetAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem offlineByDefaultToolStripMenuItem;
+        private System.ComponentModel.BackgroundWorker bgwCatalogLoader;
+        private System.Windows.Forms.ToolStripMenuItem serverToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveCatalogDetailsToolStripMenuItem;
     }
 }

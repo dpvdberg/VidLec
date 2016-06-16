@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace VidLec
 {
-    class Folder
+    [Serializable]
+    public class Folder
     {
         public List<Folder> childFolders = new List<Folder>();
 
@@ -29,16 +30,12 @@ namespace VidLec
         public string IncludeSubFolders { get; set; }
         public string DatabaseId { get; set; }
         public string SecurityId { get; set; }
-        public int Count
-        {
-            get
-            {
+        public int Count { get {
                 if (hasChilds())
                     return getBaseCount();
                 else
                     return 0;
-            }
-        }
+            } }
 
         public bool hasChilds()
         {
@@ -68,7 +65,7 @@ namespace VidLec
         {
             if (reset)
                 parent = this;
-            List<Folder> baseList = new List<Folder>();
+            List<Folder> baseList = new List<Folder>(); 
             if (parent.hasChilds())
             {
                 foreach (Folder f in parent.childFolders)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VidLec
 {
-    class Presenter
+    public class Presenter
     {
         public string Id { get; set; }
         public string Name { get; set; }

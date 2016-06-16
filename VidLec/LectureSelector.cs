@@ -2,6 +2,7 @@
 using NLog.Config;
 using NLog.Layouts;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -18,6 +19,7 @@ namespace VidLec
     {
         private static LogForm logForm = new LogForm();
         private static Logger logger;
+        private FileManager fileManager;
         Comm comm;
         
         public LectureSelector()
@@ -32,8 +34,10 @@ namespace VidLec
             }
             // Setup this form
             SetupListViews();
-            SetFormSettings();            
+            SetFormSettings();    
+            // Create class instances
             comm = new Comm();
+            fileManager = new FileManager();
             // Handle network status
             AppConfig.AppInstance.onlineMode = comm.CheckNet();
         }
@@ -47,6 +51,7 @@ namespace VidLec
             loggingEnableToolStripMenuItem.Checked = Properties.Settings.Default.LoggingEnable;
             saveCookiesToolStripMenuItem.Checked = Properties.Settings.Default.SaveCookies;
             offlineByDefaultToolStripMenuItem.Checked = Properties.Settings.Default.OfflineByDefault;
+            saveCatalogDetailsToolStripMenuItem.Checked = Properties.Settings.Default.SaveCatalogDetails;
         }
 
         private enum LoginResult
@@ -184,7 +189,15 @@ namespace VidLec
                     AppConfig.AppInstance.onlineMode = true;
                     logger.Info("Connected to the internet");
                     SetStatus(AppConfig.Constants.loggingInText, AppConfig.AppColors.OKText);
-                    bgwLogin.RunWorkerAsync();
+                    //bgwLogin.RunWorkerAsync();
+                    ///*
+                    comm.SetCatalogURL();
+                    comm.Login(Properties.Settings.Default.Username,
+                        Properties.Settings.Default.Password,
+                        true,
+                        Properties.Settings.Default.SaveCookies);
+                    test();
+                    //*/
                 }
                 else
                 {
@@ -246,8 +259,7 @@ namespace VidLec
 
         private void viewLogToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string logFilePath = Path.Combine(Path.GetTempPath(),
-                ((Type)typeof(LectureSelector)).Namespace,
+            string logFilePath = Path.Combine(AppConfig.Constants.appDataFolder,
                 AppConfig.Constants.logSubDir,
                 SimpleLayout.Evaluate(LogManager.Configuration.Variables["currentDate"].Text) + SimpleLayout.Evaluate(LogManager.Configuration.Variables["logFileExtension"].Text));
             logger.Debug(string.Format("Trying to open logfile located at \"{0}\"", logFilePath));
@@ -259,7 +271,7 @@ namespace VidLec
             ChangeNetworkStatus(!Properties.Settings.Default.OfflineByDefault);
         }
 
-        private void saveCookiesToolStripMenuItem_Click(object sender, EventArgs e)
+        private void saveCookiesToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.SaveCookies = saveCookiesToolStripMenuItem.Checked;
             Properties.Settings.Default.Save();
@@ -292,13 +304,13 @@ namespace VidLec
         }
 
 
-        private void offlineByDefaultToolStripMenuItem_Click(object sender, EventArgs e)
+        private void offlineByDefaultToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.OfflineByDefault = offlineByDefaultToolStripMenuItem.Checked;
             Properties.Settings.Default.Save();
         }
 
-        private void deleteSavedCookiesToolStripMenuItem_Click(object sender, EventArgs e)
+        private void deleteSavedCookiesToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.LoginCookieData = "";
             Properties.Settings.Default.Save();
@@ -317,6 +329,12 @@ namespace VidLec
             SetFormSettings();
             logger.Info("Reset all settings to default");
         }
+
+        private void saveCatalogDetailsToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.SaveCatalogDetails = saveCatalogDetailsToolStripMenuItem.Checked;
+            Properties.Settings.Default.Save();
+        }
         #endregion
 
         #region Background workers/threads
@@ -324,6 +342,7 @@ namespace VidLec
         {
             EnsureLogin(bgwLogin, ref e);
         }
+        
 
         private void bgwLogin_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         { 
@@ -351,6 +370,37 @@ namespace VidLec
         private void bgwLogin_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             SetProgress(e.ProgressPercentage);
+        }
+
+        private void bgwCatalogLoader_DoWork(object sender, DoWorkEventArgs e)
+        {
+            
+        }
+
+        private void test()
+        {
+            Folder savedRoot = fileManager.getCatalogDetails();
+            if (Properties.Settings.Default.SaveCatalogDetails && savedRoot != null)
+            {
+                AppConfig.AppInstance.rootFolder = savedRoot;
+            }
+            else
+            {
+                logger.Debug("Getting catalog details from comm");
+                string rawCatalogDetails = comm.GetCatalogDetails();
+                logger.Debug("Serialize catalog details");
+                Folder rootFolder = DataParser.ParseCatalogDetails(rawCatalogDetails);
+                if (Properties.Settings.Default.SaveCatalogDetails)
+                {
+                    logger.Debug("Saving serialized classes to file");
+                    fileManager.saveCatalogDetails(rootFolder);
+                }
+            }
+        }
+
+        private void bgwCatalogLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
         }
 
         #endregion

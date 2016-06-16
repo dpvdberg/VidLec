@@ -39,6 +39,14 @@ namespace VidLec
         }
         #endregion
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="remember"></param>
+        /// <param name="saveCookie"></param>
+        /// <returns></returns>
         public bool Login(string username, string password, bool remember, bool saveCookie)
         {
             if (remember)
@@ -88,7 +96,7 @@ namespace VidLec
         /// <summary>
         /// Checks if the cookie is valid to use as a log-in procedure
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Validity of the cookie</returns>
         public bool ValidateCookie()
         {
             logger.Debug("Testing cookie..");
@@ -133,6 +141,11 @@ namespace VidLec
             return false;
         }
 
+        /// <summary>
+        /// Finds catalog id in given page data
+        /// </summary>
+        /// <param name="pageData">Raw page data</param>
+        /// <returns>CatalogId string</returns>
         private bool GetCatalogId(string pageData)
         {
             try {
@@ -154,10 +167,46 @@ namespace VidLec
         }
 
         /// <summary>
-        /// 
+        /// Gets the JSON-formatted catalog details from the web
+        /// </summary>
+        /// <returns>Raw catalog details</returns>
+        public string GetCatalogDetails()
+        {
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.SiteData.catalogDetailsURL);
+            byte[] postData = Encoding.UTF8.GetBytes(AppConfig.SiteData.GetCatalogRequestBody());
+
+            CookieContainer loginCookieContainer = new CookieContainer();
+            Uri target = new Uri(AppConfig.AppInstance.catalogURL);
+            loginCookieContainer.Add(new Cookie(AppConfig.SiteData.cookieFieldName,
+                AppConfig.SiteData.GetCookieValue(
+                    AppConfig.SiteData.cookieFieldName,
+                    AppConfig.AppInstance.cookieData))
+            { Domain = target.Host });
+            webRequest.CookieContainer = loginCookieContainer;
+            webRequest.Method = "POST";
+            webRequest.ContentLength = postData.Length;
+            webRequest.ContentType = AppConfig.SiteData.catalogContentTypeHeader;
+
+            using (var stream = webRequest.GetRequestStream())
+            {
+                stream.Write(postData, 0, postData.Length);
+            }
+
+            HttpWebResponse myResp = (HttpWebResponse)webRequest.GetResponse();
+            if (myResp.StatusCode == HttpStatusCode.OK)
+                using (var reader = new StreamReader(myResp.GetResponseStream(), ASCIIEncoding.ASCII))
+                    return reader.ReadToEnd();
+            else
+                logger.Error(string.Format("Unexpected response while receiving catalog details ({0})", (int) myResp.StatusCode));
+            return "";
+        }
+
+        /// <summary>
+        /// Tries to log in and finds the cookie header
+        /// Can save the found cookie to the settings file
         /// </summary>
         /// <param name="saveCookie">Determines wheter the cookie is saved to the app user settings file</param>
-        /// <returns></returns>
+        /// <returns>Whether a cookie is found or not</returns>
         private bool SetLoginCookie(bool saveCookie)
         {
             HttpWebRequest webRequest = (HttpWebRequest) WebRequest.Create(AppConfig.SiteData.loginURL);
@@ -165,7 +214,7 @@ namespace VidLec
 
             webRequest.Method = "POST";
             webRequest.ContentLength = postData.Length;
-            webRequest.ContentType = AppConfig.SiteData.contentTypeHeader;
+            webRequest.ContentType = AppConfig.SiteData.loginContentTypeHeader;
             // Make sure we do not redirect, cookie can be found in redirect
             // This will also improve performance
             webRequest.AllowAutoRedirect = false;

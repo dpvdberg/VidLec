@@ -106,5 +106,17 @@ namespace VidLec.Properties {
                 this["SaveCookies"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SaveCatalogDetails {
+            get {
+                return ((bool)(this["SaveCatalogDetails"]));
+            }
+            set {
+                this["SaveCatalogDetails"] = value;
+            }
+        }
     }
 }
