@@ -35,8 +35,9 @@
             this.chkRemember = new System.Windows.Forms.CheckBox();
             this.chkSaveCookie = new System.Windows.Forms.CheckBox();
             this.btnLogin = new System.Windows.Forms.Button();
-            this.lblLoginStatus = new System.Windows.Forms.Label();
+            this.lblStatus = new System.Windows.Forms.Label();
             this.bgwLogin = new System.ComponentModel.BackgroundWorker();
+            this.btnOffline = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblUsername
@@ -98,33 +99,44 @@
             // 
             // btnLogin
             // 
-            this.btnLogin.Location = new System.Drawing.Point(106, 62);
+            this.btnLogin.Location = new System.Drawing.Point(106, 63);
             this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(73, 44);
+            this.btnLogin.Size = new System.Drawing.Size(73, 21);
             this.btnLogin.TabIndex = 5;
             this.btnLogin.Text = "Login";
             this.btnLogin.UseVisualStyleBackColor = true;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             // 
-            // lblLoginStatus
+            // lblStatus
             // 
-            this.lblLoginStatus.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.lblLoginStatus.Location = new System.Drawing.Point(2, 109);
-            this.lblLoginStatus.Name = "lblLoginStatus";
-            this.lblLoginStatus.Size = new System.Drawing.Size(187, 18);
-            this.lblLoginStatus.TabIndex = 6;
+            this.lblStatus.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.lblStatus.Location = new System.Drawing.Point(2, 109);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(187, 18);
+            this.lblStatus.TabIndex = 6;
             // 
             // bgwLogin
             // 
             this.bgwLogin.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwLogin_DoWork);
             this.bgwLogin.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwLogin_RunWorkerCompleted);
             // 
+            // btnOffline
+            // 
+            this.btnOffline.Location = new System.Drawing.Point(106, 86);
+            this.btnOffline.Name = "btnOffline";
+            this.btnOffline.Size = new System.Drawing.Size(73, 21);
+            this.btnOffline.TabIndex = 7;
+            this.btnOffline.Text = "Go offline";
+            this.btnOffline.UseVisualStyleBackColor = true;
+            this.btnOffline.Click += new System.EventHandler(this.btnOffline_Click);
+            // 
             // LoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(191, 129);
-            this.Controls.Add(this.lblLoginStatus);
+            this.Controls.Add(this.btnOffline);
+            this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.chkSaveCookie);
             this.Controls.Add(this.chkRemember);
@@ -150,7 +162,8 @@
         private System.Windows.Forms.CheckBox chkRemember;
         private System.Windows.Forms.CheckBox chkSaveCookie;
         private System.Windows.Forms.Button btnLogin;
-        private System.Windows.Forms.Label lblLoginStatus;
+        private System.Windows.Forms.Label lblStatus;
         private System.ComponentModel.BackgroundWorker bgwLogin;
+        private System.Windows.Forms.Button btnOffline;
     }
 }

@@ -13,8 +13,8 @@ namespace VidLec
     {
         public static class AppInstance
         {
+            public static LoginManager.LoginResult loginResult;
             public static bool onlineMode = false;
-            public static bool cookieValid = false;
             public static string cookieData = "";
             public static string username = "";
             public static string password = "";
@@ -66,6 +66,9 @@ namespace VidLec
             {
                 string postData = "";
 
+                loginPostParameters["UserName"] = AppInstance.username;
+                loginPostParameters["Password"] = AppInstance.password;
+
                 foreach (KeyValuePair<string, string> parameter in loginPostParameters)
                 {
                     postData += string.Format("{0}={1}&", parameter.Key, parameter.Value);
@@ -109,6 +112,7 @@ namespace VidLec
             public const string loggingInText = "Logging in..";
             public const string loggedIn = "Logged in";
             public const string serverError = "Server error";
+            public const string onlineModeText = "Online mode activated";
             public const string offlineModeText = "Offline mode activated";
 
             public const string noConnectionText = "No network connection available, entering offline mode..";

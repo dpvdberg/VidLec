@@ -20,8 +20,8 @@ namespace VidLec
 
         public Comm()
         {
-            logger = LogManager.GetCurrentClassLogger();
-            logger.Debug("Created logger");
+            if (Properties.Settings.Default.LoggingEnable)
+                logger = LogManager.GetCurrentClassLogger();
         }
 
         #region Arbitrary comm related methods
@@ -49,19 +49,17 @@ namespace VidLec
         /// <returns></returns>
         public bool Login(string username, string password, bool remember, bool saveCookie)
         {
-            if (remember)
-            {
-                Properties.Settings.Default.Username = username;
-                Properties.Settings.Default.Password = password;
-                Properties.Settings.Default.Save();
-            }
+
+            Properties.Settings.Default.Username = remember ? username : "";
+            Properties.Settings.Default.Password = remember ? password : "";
+            Properties.Settings.Default.Save();
 
             AppConfig.AppInstance.username = username;
             AppConfig.AppInstance.password = password;
 
-            bool loginValid =  SetLoginCookie(saveCookie);
+            bool loginValid = SetLoginCookie(saveCookie);
             if (loginValid)
-                ValidateCookie();
+                loginValid = ValidateCookie();
             return loginValid;
         }
 
@@ -97,7 +95,7 @@ namespace VidLec
         /// Checks if the cookie is valid to use as a log-in procedure
         /// </summary>
         /// <returns>Validity of the cookie</returns>
-        public bool ValidateCookie()
+        public bool ValidateCookie(bool useSavedCookie = false)
         {
             logger.Debug("Testing cookie..");
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.AppInstance.catalogURL);
@@ -107,7 +105,7 @@ namespace VidLec
             loginCookieContainer.Add(new Cookie(AppConfig.SiteData.cookieFieldName,
                 AppConfig.SiteData.GetCookieValue(
                     AppConfig.SiteData.cookieFieldName,
-                    AppConfig.AppInstance.cookieData)) { Domain = target.Host});
+                    useSavedCookie ? Properties.Settings.Default.LoginCookieData : AppConfig.AppInstance.cookieData)) { Domain = target.Host});
             webRequest.CookieContainer = loginCookieContainer;
             webRequest.Method = "GET";
             webRequest.AllowAutoRedirect = false;
@@ -120,8 +118,9 @@ namespace VidLec
                     string pageData = reader.ReadToEnd();
                     if (pageData.Contains(AppConfig.SiteData.validCookieMagicKeyword))
                     {
+                        if (useSavedCookie)
+                            AppConfig.AppInstance.cookieData = Properties.Settings.Default.LoginCookieData;
                         logger.Info("Cookie valid, logged in!");
-                        AppConfig.AppInstance.cookieValid = true;
                         if (GetCatalogId(pageData))
                             logger.Debug("Found catalogId");
                         else
@@ -137,7 +136,6 @@ namespace VidLec
             else
                 logger.Error(string.Format("Login reponse was unexpected ({0})", (int)myResp.StatusCode));
 
-            AppConfig.AppInstance.cookieValid = false;
             return false;
         }
 

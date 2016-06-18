@@ -251,7 +251,7 @@
             this.loggingDebugToolStripMenuItem.Name = "loggingDebugToolStripMenuItem";
             this.loggingDebugToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.loggingDebugToolStripMenuItem.Text = "Debug logging";
-            this.loggingDebugToolStripMenuItem.CheckedChanged += new System.EventHandler(this.loggingDebugToolStripMenuItem_CheckedChanged);
+            this.loggingDebugToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SaveSettings);
             // 
             // loggingEnableToolStripMenuItem
             // 
@@ -300,7 +300,7 @@
             this.saveCookiesToolStripMenuItem.Name = "saveCookiesToolStripMenuItem";
             this.saveCookiesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.saveCookiesToolStripMenuItem.Text = "Save cookies";
-            this.saveCookiesToolStripMenuItem.CheckedChanged += new System.EventHandler(this.saveCookiesToolStripMenuItem_CheckedChanged);
+            this.saveCookiesToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SaveSettings);
             // 
             // toolStripSeparator1
             // 
@@ -312,7 +312,7 @@
             this.deleteSavedCookiesToolStripMenuItem.Name = "deleteSavedCookiesToolStripMenuItem";
             this.deleteSavedCookiesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.deleteSavedCookiesToolStripMenuItem.Text = "Delete saved cookies";
-            this.deleteSavedCookiesToolStripMenuItem.CheckedChanged += new System.EventHandler(this.deleteSavedCookiesToolStripMenuItem_CheckedChanged);
+            this.deleteSavedCookiesToolStripMenuItem.Click += new System.EventHandler(this.deleteSavedCookiesToolStripMenuItem_Click);
             // 
             // deleteSavedCredentailsToolStripMenuItem
             // 
@@ -342,7 +342,7 @@
             this.saveCatalogDetailsToolStripMenuItem.Name = "saveCatalogDetailsToolStripMenuItem";
             this.saveCatalogDetailsToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
             this.saveCatalogDetailsToolStripMenuItem.Text = "Save catalog details";
-            this.saveCatalogDetailsToolStripMenuItem.CheckedChanged += new System.EventHandler(this.saveCatalogDetailsToolStripMenuItem_CheckedChanged);
+            this.saveCatalogDetailsToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SaveSettings);
             // 
             // NetworkStatusStrip
             // 
@@ -381,19 +381,7 @@
             this.offlineByDefaultToolStripMenuItem.Name = "offlineByDefaultToolStripMenuItem";
             this.offlineByDefaultToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.offlineByDefaultToolStripMenuItem.Text = "Offline by default";
-            this.offlineByDefaultToolStripMenuItem.CheckedChanged += new System.EventHandler(this.offlineByDefaultToolStripMenuItem_CheckedChanged);
-            // 
-            // bgwLogin
-            // 
-            this.bgwLogin.WorkerReportsProgress = true;
-            this.bgwLogin.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwLogin_DoWork);
-            this.bgwLogin.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgwLogin_ProgressChanged);
-            this.bgwLogin.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwLogin_RunWorkerCompleted);
-            // 
-            // bgwCatalogLoader
-            // 
-            this.bgwCatalogLoader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwCatalogLoader_DoWork);
-            this.bgwCatalogLoader.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwCatalogLoader_RunWorkerCompleted);
+            this.offlineByDefaultToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SaveSettings);
             // 
             // LectureSelector
             // 
@@ -408,7 +396,6 @@
             this.Name = "LectureSelector";
             this.Text = "LectureSelector";
             this.Load += new System.EventHandler(this.LectureSelector_Load);
-            this.Shown += new System.EventHandler(this.LectureSelector_Shown);
             this.TLPSplit.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.olvPresentations)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tlvAll)).EndInit();

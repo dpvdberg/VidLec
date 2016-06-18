@@ -17,7 +17,8 @@ namespace VidLec
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new LectureSelector());
+            LoginManager loginManager = new LoginManager();
+            loginManager.AutoLogin();
         }
     }
 }

@@ -13,24 +13,26 @@ namespace VidLec
 {
     public partial class LoginForm : Form
     {
-        Comm comm = new Comm();
-        Logger logger = LogManager.GetCurrentClassLogger();
-        LectureSelector LS;
+        Logger logger;
+        Comm comm;
 
-        public LoginForm(LectureSelector LS)
+        public LoginForm()
         {
-            // Pass the LectureSelector instance
-            this.LS = LS;
+            // First initialize the logger
+            if (Properties.Settings.Default.LoggingEnable)
+                logger = LogManager.GetCurrentClassLogger();
+            comm = new Comm();            
             InitializeComponent();
+            chkSaveCookie.Checked = Properties.Settings.Default.SaveCookies;
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            LS.SetStatus(AppConfig.Constants.loggingInText, AppConfig.AppColors.OKText);
-            lblLoginStatus.ForeColor = AppConfig.AppColors.OKText;
-            lblLoginStatus.Text = "Logging in..";
             if (!bgwLogin.IsBusy)
+            {
+                SetStatus(AppConfig.Constants.loggingInText, AppConfig.AppColors.OKText);
                 bgwLogin.RunWorkerAsync();
+            }
         }
 
         private void bgwLogin_DoWork(object sender, DoWorkEventArgs e)
@@ -43,17 +45,20 @@ namespace VidLec
 
         private void bgwLogin_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            bool success = (bool)e.Result;
-            if (success)
+            if ((bool)e.Result)
             {
-                LS.SetStatus(AppConfig.Constants.loggedIn, AppConfig.AppColors.OKText);
-                this.Close();
-            }
-            else
+                this.DialogResult = DialogResult.OK;
+                Close();
+            } else
             {
-                lblLoginStatus.ForeColor = AppConfig.AppColors.ErrorText;
-                lblLoginStatus.Text = "Invalid login, see log..";
+                SetStatus("Log-in failed", AppConfig.AppColors.ErrorText);
             }
+        }
+
+        private void SetStatus(string status, Color color)
+        {
+            lblStatus.ForeColor = color;
+            lblStatus.Text = status;
         }
 
         private void LoginForm_Load(object sender, EventArgs e)
@@ -65,6 +70,12 @@ namespace VidLec
             toolTip1.ShowAlways = true;
             
             toolTip1.SetToolTip(this.chkSaveCookie, "This is recommended\nAuto-login will be considerably faster");
+        }
+
+        private void btnOffline_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
+            Close();
         }
     }
 }
