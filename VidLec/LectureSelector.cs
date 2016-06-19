@@ -1,4 +1,6 @@
-﻿using NLog;
+﻿using MaterialSkin;
+using MaterialSkin.Controls;
+using NLog;
 using NLog.Config;
 using NLog.Layouts;
 using System;
@@ -15,7 +17,7 @@ using System.Windows.Threading;
 
 namespace VidLec
 {
-    public partial class LectureSelector : Form
+    public partial class LectureSelector : MaterialForm
     {
         private LoginManager loginManager;
         private static Logger logger;
@@ -41,7 +43,11 @@ namespace VidLec
             fileManager = new FileManager();
 
             ChangeNetworkStatus(AppConfig.AppInstance.loginResult == LoginManager.LoginResult.SUCCESS);
-            
+
+            var materialSkinManager = MaterialSkinManager.Instance;
+            materialSkinManager.AddFormToManage(this);
+            materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
         }
 
         /// <summary>
@@ -166,6 +172,7 @@ namespace VidLec
         {
             logger.Debug("Form loaded");
             test();
+            tlvAll.AddObject(AppConfig.AppInstance.rootFolder);
         }
 
         private void DropDownSetOnline_Click(object sender, EventArgs e)
@@ -240,11 +247,11 @@ namespace VidLec
 
         private void test()
         {
-            Folder savedRoot = fileManager.getCatalogDetails();
-            if (Properties.Settings.Default.SaveCatalogDetails && savedRoot != null)
+            Folder storedRoot = fileManager.getStoredCatalogDetails();
+            if (Properties.Settings.Default.SaveCatalogDetails && storedRoot != null)
             {
                 logger.Debug("Using saved catalog details");
-                AppConfig.AppInstance.rootFolder = savedRoot;
+                AppConfig.AppInstance.rootFolder = storedRoot;
             }
             else
             {
@@ -257,7 +264,9 @@ namespace VidLec
                     logger.Debug("Saving serialized classes to file");
                     fileManager.saveCatalogDetails(rootFolder);
                 }
+                AppConfig.AppInstance.rootFolder = rootFolder;
             }
+
         }
         #endregion
     }

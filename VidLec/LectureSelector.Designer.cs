@@ -41,9 +41,9 @@
             this.tlvAllClmCount = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.spacer = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.menuStrip = new System.Windows.Forms.MenuStrip();
+            this.bgwLogin = new System.ComponentModel.BackgroundWorker();
+            this.bgwCatalogLoader = new System.ComponentModel.BackgroundWorker();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loggingDebugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -64,8 +64,7 @@
             this.DropDownForceOffline = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.offlineByDefaultToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.bgwLogin = new System.ComponentModel.BackgroundWorker();
-            this.bgwCatalogLoader = new System.ComponentModel.BackgroundWorker();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.TLPSplit.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.olvPresentations)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tlvAll)).BeginInit();
@@ -84,11 +83,11 @@
             this.TLPSplit.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.TLPSplit.Controls.Add(this.olvPresentations, 1, 0);
             this.TLPSplit.Controls.Add(this.tlvAll, 0, 0);
-            this.TLPSplit.Location = new System.Drawing.Point(12, 27);
+            this.TLPSplit.Location = new System.Drawing.Point(12, 72);
             this.TLPSplit.Name = "TLPSplit";
             this.TLPSplit.RowCount = 1;
             this.TLPSplit.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TLPSplit.Size = new System.Drawing.Size(838, 342);
+            this.TLPSplit.Size = new System.Drawing.Size(838, 293);
             this.TLPSplit.TabIndex = 0;
             // 
             // olvPresentations
@@ -113,7 +112,7 @@
             this.olvPresentations.HighlightForegroundColor = System.Drawing.Color.Empty;
             this.olvPresentations.Location = new System.Drawing.Point(422, 4);
             this.olvPresentations.Name = "olvPresentations";
-            this.olvPresentations.Size = new System.Drawing.Size(412, 334);
+            this.olvPresentations.Size = new System.Drawing.Size(412, 285);
             this.olvPresentations.TabIndex = 1;
             this.olvPresentations.UseCompatibleStateImageBehavior = false;
             this.olvPresentations.View = System.Windows.Forms.View.Details;
@@ -163,7 +162,7 @@
             this.tlvAll.Location = new System.Drawing.Point(4, 4);
             this.tlvAll.Name = "tlvAll";
             this.tlvAll.ShowGroups = false;
-            this.tlvAll.Size = new System.Drawing.Size(411, 334);
+            this.tlvAll.Size = new System.Drawing.Size(411, 285);
             this.tlvAll.TabIndex = 2;
             this.tlvAll.UseCompatibleStateImageBehavior = false;
             this.tlvAll.View = System.Windows.Forms.View.Details;
@@ -184,13 +183,17 @@
             // 
             // statusStrip
             // 
+            this.statusStrip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.statusStrip.BackColor = System.Drawing.Color.Transparent;
+            this.statusStrip.Dock = System.Windows.Forms.DockStyle.None;
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripProgressBar,
-            this.spacer,
             this.toolStripStatusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 372);
+            this.statusStrip.Location = new System.Drawing.Point(731, 368);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(862, 22);
+            this.statusStrip.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.statusStrip.Size = new System.Drawing.Size(119, 22);
+            this.statusStrip.SizingGrip = false;
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip";
             // 
@@ -199,27 +202,11 @@
             this.toolStripProgressBar.Name = "toolStripProgressBar";
             this.toolStripProgressBar.Size = new System.Drawing.Size(100, 16);
             // 
-            // spacer
-            // 
-            this.spacer.Name = "spacer";
-            this.spacer.Size = new System.Drawing.Size(745, 17);
-            this.spacer.Spring = true;
-            // 
             // toolStripStatusLabel
             // 
+            this.toolStripStatusLabel.BackColor = System.Drawing.Color.Transparent;
             this.toolStripStatusLabel.Name = "toolStripStatusLabel";
             this.toolStripStatusLabel.Size = new System.Drawing.Size(0, 17);
-            // 
-            // menuStrip
-            // 
-            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.optionsToolStripMenuItem,
-            this.NetworkStatusStrip});
-            this.menuStrip.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(862, 24);
-            this.menuStrip.TabIndex = 2;
-            this.menuStrip.Text = "menuStrip";
             // 
             // optionsToolStripMenuItem
             // 
@@ -346,7 +333,6 @@
             // 
             // NetworkStatusStrip
             // 
-            this.NetworkStatusStrip.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.NetworkStatusStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.DropDownSetOnline,
             this.DropDownForceOffline,
@@ -383,6 +369,21 @@
             this.offlineByDefaultToolStripMenuItem.Text = "Offline by default";
             this.offlineByDefaultToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SaveSettings);
             // 
+            // menuStrip
+            // 
+            this.menuStrip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.menuStrip.BackColor = System.Drawing.Color.Transparent;
+            this.menuStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.optionsToolStripMenuItem,
+            this.NetworkStatusStrip});
+            this.menuStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
+            this.menuStrip.Location = new System.Drawing.Point(686, 32);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(167, 24);
+            this.menuStrip.TabIndex = 2;
+            this.menuStrip.Text = "menuStrip";
+            // 
             // LectureSelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -391,7 +392,6 @@
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.menuStrip);
             this.Controls.Add(this.TLPSplit);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MainMenuStrip = this.menuStrip;
             this.Name = "LectureSelector";
             this.Text = "LectureSelector";
@@ -413,8 +413,6 @@
         private System.Windows.Forms.TableLayoutPanel TLPSplit;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
-        private System.Windows.Forms.MenuStrip menuStrip;
-        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private BrightIdeasSoftware.ObjectListView olvPresentations;
         private BrightIdeasSoftware.OLVColumn olvPresClmName;
         private BrightIdeasSoftware.OLVColumn olvPresClmDate;
@@ -424,28 +422,29 @@
         private BrightIdeasSoftware.TreeListView tlvAll;
         private BrightIdeasSoftware.OLVColumn tlvAllClmName;
         private BrightIdeasSoftware.OLVColumn tlvAllClmCount;
-        private System.Windows.Forms.ToolStripStatusLabel spacer;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
-        private System.Windows.Forms.ToolStripMenuItem NetworkStatusStrip;
-        private System.Windows.Forms.ToolStripMenuItem DropDownSetOnline;
-        private System.Windows.Forms.ToolStripMenuItem DropDownForceOffline;
+        public System.ComponentModel.BackgroundWorker bgwLogin;
+        private System.ComponentModel.BackgroundWorker bgwCatalogLoader;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loggingToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem viewLogToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loggingDebugToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loggingEnableToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem openLogWindowStripMenuItem;
-        public System.ComponentModel.BackgroundWorker bgwLogin;
-        private System.Windows.Forms.ToolStripMenuItem accountToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem viewLogToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openLogWindowStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem accountToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveCookiesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem deleteSavedCookiesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteSavedCredentailsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resetAllToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripMenuItem offlineByDefaultToolStripMenuItem;
-        private System.ComponentModel.BackgroundWorker bgwCatalogLoader;
         private System.Windows.Forms.ToolStripMenuItem serverToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveCatalogDetailsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem NetworkStatusStrip;
+        private System.Windows.Forms.ToolStripMenuItem DropDownSetOnline;
+        private System.Windows.Forms.ToolStripMenuItem DropDownForceOffline;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem offlineByDefaultToolStripMenuItem;
+        private System.Windows.Forms.MenuStrip menuStrip;
     }
 }

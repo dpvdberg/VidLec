@@ -84,6 +84,7 @@ namespace VidLec
             COULD_NOT_GET_CATALOG = 4
         }
 
+        [Flags]
         public enum LoginResult
         {
             NULL = 0,

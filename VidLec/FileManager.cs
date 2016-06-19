@@ -44,7 +44,7 @@ namespace VidLec
             }
         }
 
-        public Folder getCatalogDetails()
+        public Folder getStoredCatalogDetails()
         {
             if (Directory.GetFiles(catalogDetailsPath).Count() == 0)
                 return null;

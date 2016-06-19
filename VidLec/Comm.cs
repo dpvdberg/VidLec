@@ -66,14 +66,37 @@ namespace VidLec
         /// <summary>
         /// Finds and sets the catalog url in the AppConfig
         /// </summary>
-        public bool SetCatalogURL()
+        public bool SetCatalogURL(int tryCounter = 1)
         {
+            if (tryCounter > 5)
+            {
+                logger.Debug("Could not find catalog URL, stopping..");
+                return false;
+            }
+            else if (tryCounter > 1)
+                logger.Debug(string.Format("Requesting catalog URL, try {0}", tryCounter));
+            else
+                logger.Debug("Requesting catalog URL..");
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.SiteData.baseURL);
 
             webRequest.Method = "GET";
             webRequest.AllowAutoRedirect = false;
+            webRequest.Timeout = 5000;
 
-            HttpWebResponse myResp = (HttpWebResponse)webRequest.GetResponse();
+            HttpWebResponse myResp = null;
+            try
+            {
+                myResp = (HttpWebResponse)webRequest.GetResponse();
+            }
+            catch (WebException e)
+            {
+                if (e.Status == WebExceptionStatus.Timeout)
+                {
+                    logger.Debug("Request timed out");
+                    return SetCatalogURL(tryCounter + 1);
+                }
+                else throw;
+            }
             if (myResp.StatusCode == HttpStatusCode.Redirect)
             {
                 string[] redirectHeader = myResp.Headers.GetValues(AppConfig.SiteData.redirectHeaderName);
@@ -95,9 +118,17 @@ namespace VidLec
         /// Checks if the cookie is valid to use as a log-in procedure
         /// </summary>
         /// <returns>Validity of the cookie</returns>
-        public bool ValidateCookie(bool useSavedCookie = false)
+        public bool ValidateCookie(bool useSavedCookie = false, int tryCounter = 1)
         {
-            logger.Debug("Testing cookie..");
+            if (tryCounter > 5)
+            {
+                logger.Debug("Could not validate cookie, stopping..");
+                return false;
+            }
+            else if (tryCounter > 1)
+                logger.Debug(string.Format("Testing cookie, try {0}", tryCounter));
+            else
+                logger.Debug("Testing cookie..");
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.AppInstance.catalogURL);
 
             CookieContainer loginCookieContainer = new CookieContainer();
@@ -109,8 +140,21 @@ namespace VidLec
             webRequest.CookieContainer = loginCookieContainer;
             webRequest.Method = "GET";
             webRequest.AllowAutoRedirect = false;
+            webRequest.Timeout = 5000;
 
-            HttpWebResponse myResp = (HttpWebResponse)webRequest.GetResponse();
+            HttpWebResponse myResp = null;
+            try {
+                myResp = (HttpWebResponse)webRequest.GetResponse();
+            }
+            catch (WebException e)
+            {
+                if (e.Status == WebExceptionStatus.Timeout)
+                {
+                    logger.Debug("Request timed out");
+                    return ValidateCookie(useSavedCookie, tryCounter + 1);
+                }
+                else throw;
+            }
             if (myResp.StatusCode == HttpStatusCode.OK)
             {
                 using (var reader = new StreamReader(myResp.GetResponseStream(), ASCIIEncoding.ASCII))
@@ -168,8 +212,17 @@ namespace VidLec
         /// Gets the JSON-formatted catalog details from the web
         /// </summary>
         /// <returns>Raw catalog details</returns>
-        public string GetCatalogDetails()
+        public string GetCatalogDetails(int tryCounter = 1)
         {
+            if (tryCounter > 5)
+            {
+                logger.Debug("Could get catalog ID, stopping..");
+                return "";
+            }
+            else if (tryCounter > 1)
+                logger.Debug(string.Format("Getting catalog ID, try {0}", tryCounter));
+            else
+                logger.Debug("Getting catalog ID..");
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.SiteData.catalogDetailsURL);
             byte[] postData = Encoding.UTF8.GetBytes(AppConfig.SiteData.GetCatalogRequestBody());
 
@@ -184,13 +237,28 @@ namespace VidLec
             webRequest.Method = "POST";
             webRequest.ContentLength = postData.Length;
             webRequest.ContentType = AppConfig.SiteData.catalogContentTypeHeader;
+            webRequest.Timeout = 5000;
 
             using (var stream = webRequest.GetRequestStream())
             {
                 stream.Write(postData, 0, postData.Length);
             }
 
-            HttpWebResponse myResp = (HttpWebResponse)webRequest.GetResponse();
+            HttpWebResponse myResp = null;
+            try
+            {
+                myResp = (HttpWebResponse)webRequest.GetResponse();
+            }
+            catch (WebException e)
+            {
+                if (e.Status == WebExceptionStatus.Timeout)
+                {
+                    logger.Debug("Request timed out");
+                    return GetCatalogDetails(tryCounter + 1);
+                }
+                else throw;
+            }
+
             if (myResp.StatusCode == HttpStatusCode.OK)
                 using (var reader = new StreamReader(myResp.GetResponseStream(), ASCIIEncoding.ASCII))
                     return reader.ReadToEnd();
@@ -205,8 +273,17 @@ namespace VidLec
         /// </summary>
         /// <param name="saveCookie">Determines wheter the cookie is saved to the app user settings file</param>
         /// <returns>Whether a cookie is found or not</returns>
-        private bool SetLoginCookie(bool saveCookie)
+        private bool SetLoginCookie(bool saveCookie, int tryCounter = 1)
         {
+            if (tryCounter > 5)
+            {
+                logger.Debug("Could not get cookie, stopping..");
+                return false;
+            }
+            else if (tryCounter > 1)
+                logger.Debug(string.Format("Getting cookie, try {0}", tryCounter));
+            else
+                logger.Debug("Getting cookie..");
             HttpWebRequest webRequest = (HttpWebRequest) WebRequest.Create(AppConfig.SiteData.loginURL);
             byte[] postData = AppConfig.SiteData.GetLoginPostData();
 
@@ -216,13 +293,27 @@ namespace VidLec
             // Make sure we do not redirect, cookie can be found in redirect
             // This will also improve performance
             webRequest.AllowAutoRedirect = false;
+            webRequest.Timeout = 5000;
 
             using (var stream = webRequest.GetRequestStream())
             {
                 stream.Write(postData, 0, postData.Length);
             }
 
-            HttpWebResponse myResp = (HttpWebResponse)webRequest.GetResponse();
+            HttpWebResponse myResp = null;
+            try
+            {
+                myResp = (HttpWebResponse)webRequest.GetResponse();
+            }
+            catch (WebException e)
+            {
+                if (e.Status == WebExceptionStatus.Timeout)
+                {
+                    logger.Debug("Request timed out");
+                    return SetLoginCookie(saveCookie, tryCounter + 1);
+                }
+                else throw;
+            }
             if (myResp.StatusCode == HttpStatusCode.Redirect)
             {
                 string[] setCookieHeader = myResp.Headers.GetValues(AppConfig.SiteData.cookieHeaderName);
