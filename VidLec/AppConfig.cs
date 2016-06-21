@@ -105,6 +105,15 @@ namespace VidLec
         /// </summary>
         public static class Constants
         {
+            /// <summary>
+            /// Numeric constants
+            /// </summary>
+            public const int connectionTries = 5;
+            public const int connectionTimeout = 5000;
+
+            /// <summary>
+            /// Auxiliary
+            /// </summary>
             public const string appName = "VidLec";
             public const string DateTimeFTM = "O";
 

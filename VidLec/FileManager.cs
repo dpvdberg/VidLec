@@ -18,24 +18,23 @@ namespace VidLec
         {
             List<string> directories = new List<string> { AppConfig.Constants.appDataFolder,
                                                           catalogDetailsPath,
-                                                          videoPath
-                                                        };
+                                                          videoPath };
             foreach (string dir in directories)
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
         }
 
-        public void clearPath(string path)
+        public void ClearPath(string path)
         {
             foreach (string file in Directory.GetFiles(path))
                 File.Delete(file);
         }
 
-        public void saveCatalogDetails(Folder rootFolder)
+        public void SaveCatalogDetails(Folder rootFolder)
         {
             string serializationFile = Path.Combine(catalogDetailsPath, DateTime.Now.ToBinary() + ".bin");
 
-            clearPath(catalogDetailsPath);
+            ClearPath(catalogDetailsPath);
 
             using (Stream stream = File.Open(serializationFile, FileMode.Create))
             {
@@ -44,7 +43,7 @@ namespace VidLec
             }
         }
 
-        public Folder getStoredCatalogDetails()
+        public Folder GetStoredCatalogDetails()
         {
             if (Directory.GetFiles(catalogDetailsPath).Count() == 0)
                 return null;
@@ -65,7 +64,7 @@ namespace VidLec
                 if (diff == TimeSpan.Zero || diff.Days > AppConfig.AppChosenVariables.catalogDetailsRetentionDays)
                 {
                     logger.Debug("Catalog details file not valid");
-                    clearPath(catalogDetailsPath);
+                    ClearPath(catalogDetailsPath);
                     return null;
                 }
                 else
@@ -80,7 +79,7 @@ namespace VidLec
             else if (Directory.GetFiles(catalogDetailsPath).Count() > 1)
             {
                 logger.Error("Found multiple catalog details files, cleaning up..");
-                clearPath(catalogDetailsPath);
+                ClearPath(catalogDetailsPath);
                 return null;
             }
             else

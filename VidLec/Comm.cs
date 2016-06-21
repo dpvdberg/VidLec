@@ -40,12 +40,12 @@ namespace VidLec
         #endregion
 
         /// <summary>
-        /// 
+        /// Login to the video lecture site.
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
-        /// <param name="remember"></param>
-        /// <param name="saveCookie"></param>
+        /// <param name="username">The users' username</param>
+        /// <param name="password">The users' password</param>
+        /// <param name="remember">Whether or not to save credentials</param>
+        /// <param name="saveCookie">Whether or not to save cookies</param>
         /// <returns></returns>
         public bool Login(string username, string password, bool remember, bool saveCookie)
         {
@@ -68,7 +68,7 @@ namespace VidLec
         /// </summary>
         public bool SetCatalogURL(int tryCounter = 1)
         {
-            if (tryCounter > 5)
+            if (tryCounter > AppConfig.Constants.connectionTries)
             {
                 logger.Debug("Could not find catalog URL, stopping..");
                 return false;
@@ -81,7 +81,7 @@ namespace VidLec
 
             webRequest.Method = "GET";
             webRequest.AllowAutoRedirect = false;
-            webRequest.Timeout = 5000;
+            webRequest.Timeout = AppConfig.Constants.connectionTimeout;
 
             HttpWebResponse myResp = null;
             try
@@ -115,12 +115,12 @@ namespace VidLec
         }
 
         /// <summary>
-        /// Checks if the cookie is valid to use as a log-in procedure
+        /// Checks if the cookie is valid to use as a log-in procedure.
         /// </summary>
         /// <returns>Validity of the cookie</returns>
         public bool ValidateCookie(bool useSavedCookie = false, int tryCounter = 1)
         {
-            if (tryCounter > 5)
+            if (tryCounter > AppConfig.Constants.connectionTries)
             {
                 logger.Debug("Could not validate cookie, stopping..");
                 return false;
@@ -140,7 +140,7 @@ namespace VidLec
             webRequest.CookieContainer = loginCookieContainer;
             webRequest.Method = "GET";
             webRequest.AllowAutoRedirect = false;
-            webRequest.Timeout = 5000;
+            webRequest.Timeout = AppConfig.Constants.connectionTimeout;
 
             HttpWebResponse myResp = null;
             try {
@@ -214,7 +214,7 @@ namespace VidLec
         /// <returns>Raw catalog details</returns>
         public string GetCatalogDetails(int tryCounter = 1)
         {
-            if (tryCounter > 5)
+            if (tryCounter > AppConfig.Constants.connectionTries)
             {
                 logger.Debug("Could get catalog ID, stopping..");
                 return "";
@@ -237,7 +237,7 @@ namespace VidLec
             webRequest.Method = "POST";
             webRequest.ContentLength = postData.Length;
             webRequest.ContentType = AppConfig.SiteData.catalogContentTypeHeader;
-            webRequest.Timeout = 5000;
+            webRequest.Timeout = AppConfig.Constants.connectionTimeout;
 
             using (var stream = webRequest.GetRequestStream())
             {
@@ -275,7 +275,7 @@ namespace VidLec
         /// <returns>Whether a cookie is found or not</returns>
         private bool SetLoginCookie(bool saveCookie, int tryCounter = 1)
         {
-            if (tryCounter > 5)
+            if (tryCounter > AppConfig.Constants.connectionTries)
             {
                 logger.Debug("Could not get cookie, stopping..");
                 return false;
@@ -293,7 +293,7 @@ namespace VidLec
             // Make sure we do not redirect, cookie can be found in redirect
             // This will also improve performance
             webRequest.AllowAutoRedirect = false;
-            webRequest.Timeout = 5000;
+            webRequest.Timeout = AppConfig.Constants.connectionTimeout;
 
             using (var stream = webRequest.GetRequestStream())
             {

@@ -1,9 +1,11 @@
-﻿using MaterialSkin;
+﻿using BrightIdeasSoftware;
+using MaterialSkin;
 using MaterialSkin.Controls;
 using NLog;
 using NLog.Config;
 using NLog.Layouts;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -23,10 +25,17 @@ namespace VidLec
         private static Logger logger;
         private FileManager fileManager;
         private LogForm logForm;
-        Comm comm;
+        private Comm comm;
 
+        // This bool is used to prevent events firing when
+        // changing control values during runtime
         private bool initializingSettings = true;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="loginManager">LoginManager instance</param>
+        /// <param name="logForm">LogForm instance</param>
         public LectureSelector(LoginManager loginManager, LogForm logForm)
         {
             InitializeComponent();
@@ -132,12 +141,21 @@ namespace VidLec
             }
         }
 
+        /// <summary>
+        /// Sets the status label
+        /// </summary>
+        /// <param name="status">Status text</param>
+        /// <param name="color">Text color</param>
         public void SetStatus(string status, Color color)
         {
             toolStripStatusLabel.ForeColor = color;
             toolStripStatusLabel.Text = status;
         }
 
+        /// <summary>
+        /// Sets the progress bar, thread safe
+        /// </summary>
+        /// <param name="percentage">0-100 percentage</param>
         public void SetProgress(int percentage)
         {
             statusStrip.Invoke(new Action(() => toolStripProgressBar.Value = percentage));
@@ -150,6 +168,11 @@ namespace VidLec
             }
         }
 
+        /// <summary>
+        /// Save toolstip checked items to settings
+        /// </summary>
+        /// <param name="sender">The object calling this event</param>
+        /// <param name="e">Event arguments</param>
         private void SaveSettings(object sender, EventArgs e)
         {
             if (!initializingSettings) {
@@ -166,13 +189,55 @@ namespace VidLec
             }
         }
 
+        /// <summary>
+        /// Sets the AppInstance root folder by first trying to get stored catalog details.
+        /// If these are not found, comm class will generate new catalog details.
+        /// </summary>
+        /// <returns>Wheter finding a root was successful</returns>
+        private bool SetRootFolder()
+        {
+            Folder storedRoot = fileManager.GetStoredCatalogDetails();
+            if (Properties.Settings.Default.SaveCatalogDetails && storedRoot != null)
+            {
+                logger.Debug("Using saved catalog details");
+                AppConfig.AppInstance.rootFolder = storedRoot;
+            }
+            else
+            {
+                logger.Debug("Getting catalog details from comm");
+                string rawCatalogDetails = comm.GetCatalogDetails();
+                logger.Debug("Serialize catalog details");
+                Folder rootFolder = DataParser.ParseCatalogDetails(rawCatalogDetails);
+                if (Properties.Settings.Default.SaveCatalogDetails)
+                {
+                    logger.Debug("Saving serialized classes to file");
+                    fileManager.SaveCatalogDetails(rootFolder);
+                }
+                AppConfig.AppInstance.rootFolder = rootFolder;
+            }
+
+            if (AppConfig.AppInstance.rootFolder == null)
+            {
+                logger.Error("Could not get a root folder");
+                return false;
+            }
+            else
+            {
+                logger.Debug("Successfully loaded root folder");
+                return true;
+            }
+        }
+
         #region GUI events
 
         private void LectureSelector_Load(object sender, EventArgs e)
         {
-            logger.Debug("Form loaded");
-            test();
-            tlvAll.AddObject(AppConfig.AppInstance.rootFolder);
+            logger.Debug("Form loaded, attemting to set root folder for catalog details");
+            if (SetRootFolder())
+            {
+                tlvAll.AddObject(AppConfig.AppInstance.rootFolder);
+                tlvAll.Expand(AppConfig.AppInstance.rootFolder);
+            }
         }
 
         private void DropDownSetOnline_Click(object sender, EventArgs e)
@@ -241,32 +306,33 @@ namespace VidLec
             SetFormSettings();
             logger.Info("Reset all settings to default");
         }
-        #endregion
 
-        #region Background workers/threads
-
-        private void test()
+        List<Folder> expandedObjects = null;
+        string lastSearchString = "";
+        private void txtSearch_TextChanged(object sender, EventArgs e)
         {
-            Folder storedRoot = fileManager.getStoredCatalogDetails();
-            if (Properties.Settings.Default.SaveCatalogDetails && storedRoot != null)
+            if (txtSearch.Text != "")
             {
-                logger.Debug("Using saved catalog details");
-                AppConfig.AppInstance.rootFolder = storedRoot;
+                if (lastSearchString == "")
+                {
+                    expandedObjects = new List<Folder>();
+                    foreach (Folder f in tlvAll.ExpandedObjects)
+                        expandedObjects.Add(f);
+                }
+
+                tlvAll.ExpandAll();
+                TextMatchFilter filter = new TextMatchFilter(tlvAll, txtSearch.Text);
+                tlvAll.ModelFilter = filter;
+                tlvAll.DefaultRenderer = new HighlightTextRenderer(filter);
             }
             else
             {
-                logger.Debug("Getting catalog details from comm");
-                string rawCatalogDetails = comm.GetCatalogDetails();
-                logger.Debug("Serialize catalog details");
-                Folder rootFolder = DataParser.ParseCatalogDetails(rawCatalogDetails);
-                if (Properties.Settings.Default.SaveCatalogDetails)
-                {
-                    logger.Debug("Saving serialized classes to file");
-                    fileManager.saveCatalogDetails(rootFolder);
-                }
-                AppConfig.AppInstance.rootFolder = rootFolder;
+                tlvAll.ModelFilter = null;
+                tlvAll.CollapseAll();
+                foreach (Folder f in expandedObjects)
+                    tlvAll.Expand(f);
             }
-
+            lastSearchString = txtSearch.Text;
         }
         #endregion
     }

@@ -65,6 +65,8 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.offlineByDefaultToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
+            this.txtSearch = new System.Windows.Forms.TextBox();
+            this.lblSearch = new System.Windows.Forms.Label();
             this.TLPSplit.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.olvPresentations)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tlvAll)).BeginInit();
@@ -165,6 +167,7 @@
             this.tlvAll.Size = new System.Drawing.Size(411, 285);
             this.tlvAll.TabIndex = 2;
             this.tlvAll.UseCompatibleStateImageBehavior = false;
+            this.tlvAll.UseFiltering = true;
             this.tlvAll.View = System.Windows.Forms.View.Details;
             this.tlvAll.VirtualMode = true;
             // 
@@ -177,6 +180,7 @@
             // tlvAllClmCount
             // 
             this.tlvAllClmCount.AspectName = "Count";
+            this.tlvAllClmCount.Searchable = false;
             this.tlvAllClmCount.Text = "Item count";
             this.tlvAllClmCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.tlvAllClmCount.Width = 77;
@@ -215,7 +219,7 @@
             this.accountToolStripMenuItem,
             this.serverToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(66, 21);
             this.optionsToolStripMenuItem.Text = "Options";
             // 
             // loggingToolStripMenuItem
@@ -227,7 +231,7 @@
             this.viewLogToolStripMenuItem,
             this.openLogWindowStripMenuItem});
             this.loggingToolStripMenuItem.Name = "loggingToolStripMenuItem";
-            this.loggingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loggingToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.loggingToolStripMenuItem.Text = "Logging";
             // 
             // loggingDebugToolStripMenuItem
@@ -236,7 +240,7 @@
             this.loggingDebugToolStripMenuItem.CheckOnClick = true;
             this.loggingDebugToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.loggingDebugToolStripMenuItem.Name = "loggingDebugToolStripMenuItem";
-            this.loggingDebugToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.loggingDebugToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.loggingDebugToolStripMenuItem.Text = "Debug logging";
             this.loggingDebugToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SaveSettings);
             // 
@@ -246,26 +250,26 @@
             this.loggingEnableToolStripMenuItem.CheckOnClick = true;
             this.loggingEnableToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.loggingEnableToolStripMenuItem.Name = "loggingEnableToolStripMenuItem";
-            this.loggingEnableToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.loggingEnableToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.loggingEnableToolStripMenuItem.Text = "Enable";
             this.loggingEnableToolStripMenuItem.CheckedChanged += new System.EventHandler(this.loggingEnableToolStripMenuItem_CheckedChanged);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(165, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(176, 6);
             // 
             // viewLogToolStripMenuItem
             // 
             this.viewLogToolStripMenuItem.Name = "viewLogToolStripMenuItem";
-            this.viewLogToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.viewLogToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.viewLogToolStripMenuItem.Text = "Open log file";
             this.viewLogToolStripMenuItem.Click += new System.EventHandler(this.viewLogToolStripMenuItem_Click);
             // 
             // openLogWindowStripMenuItem
             // 
             this.openLogWindowStripMenuItem.Name = "openLogWindowStripMenuItem";
-            this.openLogWindowStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.openLogWindowStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.openLogWindowStripMenuItem.Text = "Open log window";
             this.openLogWindowStripMenuItem.Click += new System.EventHandler(this.openLogWindowStripMenuItem_Click);
             // 
@@ -278,40 +282,40 @@
             this.deleteSavedCredentailsToolStripMenuItem,
             this.resetAllToolStripMenuItem});
             this.accountToolStripMenuItem.Name = "accountToolStripMenuItem";
-            this.accountToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.accountToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.accountToolStripMenuItem.Text = "Account";
             // 
             // saveCookiesToolStripMenuItem
             // 
             this.saveCookiesToolStripMenuItem.CheckOnClick = true;
             this.saveCookiesToolStripMenuItem.Name = "saveCookiesToolStripMenuItem";
-            this.saveCookiesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.saveCookiesToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.saveCookiesToolStripMenuItem.Text = "Save cookies";
             this.saveCookiesToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SaveSettings);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(197, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(215, 6);
             // 
             // deleteSavedCookiesToolStripMenuItem
             // 
             this.deleteSavedCookiesToolStripMenuItem.Name = "deleteSavedCookiesToolStripMenuItem";
-            this.deleteSavedCookiesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.deleteSavedCookiesToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.deleteSavedCookiesToolStripMenuItem.Text = "Delete saved cookies";
             this.deleteSavedCookiesToolStripMenuItem.Click += new System.EventHandler(this.deleteSavedCookiesToolStripMenuItem_Click);
             // 
             // deleteSavedCredentailsToolStripMenuItem
             // 
             this.deleteSavedCredentailsToolStripMenuItem.Name = "deleteSavedCredentailsToolStripMenuItem";
-            this.deleteSavedCredentailsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.deleteSavedCredentailsToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.deleteSavedCredentailsToolStripMenuItem.Text = "Delete saved credentails";
             this.deleteSavedCredentailsToolStripMenuItem.Click += new System.EventHandler(this.deleteSavedCredentailsToolStripMenuItem_Click);
             // 
             // resetAllToolStripMenuItem
             // 
             this.resetAllToolStripMenuItem.Name = "resetAllToolStripMenuItem";
-            this.resetAllToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.resetAllToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.resetAllToolStripMenuItem.Text = "Reset all";
             this.resetAllToolStripMenuItem.Click += new System.EventHandler(this.resetAllToolStripMenuItem_Click);
             // 
@@ -320,14 +324,14 @@
             this.serverToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveCatalogDetailsToolStripMenuItem});
             this.serverToolStripMenuItem.Name = "serverToolStripMenuItem";
-            this.serverToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.serverToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.serverToolStripMenuItem.Text = "Server";
             // 
             // saveCatalogDetailsToolStripMenuItem
             // 
             this.saveCatalogDetailsToolStripMenuItem.CheckOnClick = true;
             this.saveCatalogDetailsToolStripMenuItem.Name = "saveCatalogDetailsToolStripMenuItem";
-            this.saveCatalogDetailsToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.saveCatalogDetailsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveCatalogDetailsToolStripMenuItem.Text = "Save catalog details";
             this.saveCatalogDetailsToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SaveSettings);
             // 
@@ -339,33 +343,33 @@
             this.toolStripSeparator3,
             this.offlineByDefaultToolStripMenuItem});
             this.NetworkStatusStrip.Name = "NetworkStatusStrip";
-            this.NetworkStatusStrip.Size = new System.Drawing.Size(98, 20);
+            this.NetworkStatusStrip.Size = new System.Drawing.Size(107, 21);
             this.NetworkStatusStrip.Text = "Network status";
             // 
             // DropDownSetOnline
             // 
             this.DropDownSetOnline.Name = "DropDownSetOnline";
-            this.DropDownSetOnline.Size = new System.Drawing.Size(166, 22);
+            this.DropDownSetOnline.Size = new System.Drawing.Size(176, 22);
             this.DropDownSetOnline.Text = "Check online";
             this.DropDownSetOnline.Click += new System.EventHandler(this.DropDownSetOnline_Click);
             // 
             // DropDownForceOffline
             // 
             this.DropDownForceOffline.Name = "DropDownForceOffline";
-            this.DropDownForceOffline.Size = new System.Drawing.Size(166, 22);
+            this.DropDownForceOffline.Size = new System.Drawing.Size(176, 22);
             this.DropDownForceOffline.Text = "Force offline";
             this.DropDownForceOffline.Click += new System.EventHandler(this.DropDownForceOffline_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(163, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(173, 6);
             // 
             // offlineByDefaultToolStripMenuItem
             // 
             this.offlineByDefaultToolStripMenuItem.CheckOnClick = true;
             this.offlineByDefaultToolStripMenuItem.Name = "offlineByDefaultToolStripMenuItem";
-            this.offlineByDefaultToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.offlineByDefaultToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.offlineByDefaultToolStripMenuItem.Text = "Offline by default";
             this.offlineByDefaultToolStripMenuItem.CheckedChanged += new System.EventHandler(this.SaveSettings);
             // 
@@ -374,21 +378,41 @@
             this.menuStrip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.menuStrip.BackColor = System.Drawing.Color.Transparent;
             this.menuStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.menuStrip.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.optionsToolStripMenuItem,
             this.NetworkStatusStrip});
             this.menuStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
-            this.menuStrip.Location = new System.Drawing.Point(686, 32);
+            this.menuStrip.Location = new System.Drawing.Point(672, 32);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(167, 24);
+            this.menuStrip.Size = new System.Drawing.Size(181, 25);
             this.menuStrip.TabIndex = 2;
             this.menuStrip.Text = "menuStrip";
+            // 
+            // txtSearch
+            // 
+            this.txtSearch.Location = new System.Drawing.Point(62, 370);
+            this.txtSearch.Name = "txtSearch";
+            this.txtSearch.Size = new System.Drawing.Size(100, 20);
+            this.txtSearch.TabIndex = 3;
+            this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
+            // 
+            // lblSearch
+            // 
+            this.lblSearch.AutoSize = true;
+            this.lblSearch.Location = new System.Drawing.Point(12, 373);
+            this.lblSearch.Name = "lblSearch";
+            this.lblSearch.Size = new System.Drawing.Size(44, 13);
+            this.lblSearch.TabIndex = 4;
+            this.lblSearch.Text = "Search:";
             // 
             // LectureSelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(862, 394);
+            this.Controls.Add(this.lblSearch);
+            this.Controls.Add(this.txtSearch);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.menuStrip);
             this.Controls.Add(this.TLPSplit);
@@ -446,5 +470,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem offlineByDefaultToolStripMenuItem;
         private System.Windows.Forms.MenuStrip menuStrip;
+        private System.Windows.Forms.TextBox txtSearch;
+        private System.Windows.Forms.Label lblSearch;
     }
 }
