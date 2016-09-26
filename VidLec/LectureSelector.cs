@@ -16,20 +16,22 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using Newtonsoft.Json.Linq;
+using Vlc.DotNet.Forms.Samples;
 
 namespace VidLec
 {
     public partial class LectureSelector : MaterialForm
     {
-        private LoginManager loginManager;
-        private static Logger logger;
-        private FileManager fileManager;
-        private LogForm logForm;
-        private Comm comm;
+        private readonly LoginManager _loginManager;
+        private static Logger _logger;
+        private readonly FileManager _fileManager;
+        private readonly LogForm _logForm;
+        private readonly Comm _comm;
 
         // This bool is used to prevent events firing when
         // changing control values during runtime
-        private bool initializingSettings = true;
+        private bool _initializingSettings = true;
 
         /// <summary>
         /// Constructor
@@ -38,25 +40,31 @@ namespace VidLec
         /// <param name="logForm">LogForm instance</param>
         public LectureSelector(LoginManager loginManager, LogForm logForm)
         {
+            //test
+            //LectureViewer lectureViewer = new LectureViewer();
+            //lectureViewer.Show();
+
+
             InitializeComponent();
             SetFormSettings();
             if (Properties.Settings.Default.LoggingEnable)
-                logger = LogManager.GetCurrentClassLogger();
+                _logger = LogManager.GetCurrentClassLogger();
             // Setup this form
             SetupListViews();
             // Set parameter forms
-            this.loginManager = loginManager;
-            this.logForm = logForm;
+            this._loginManager = loginManager;
+            this._logForm = logForm;
             // Create class instances
-            comm = new Comm();
-            fileManager = new FileManager();
+            _comm = new Comm();
+            _fileManager = new FileManager();
 
-            ChangeNetworkStatus(AppConfig.AppInstance.loginResult == LoginManager.LoginResult.SUCCESS);
+            ChangeNetworkStatus(AppConfig.AppInstance.LoginResult == LoginManager.LoginResult.Success);
 
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
             materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
-            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900,
+                Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
         }
 
         /// <summary>
@@ -64,13 +72,13 @@ namespace VidLec
         /// </summary>
         private void SetFormSettings()
         {
-            initializingSettings = true;
+            _initializingSettings = true;
             loggingDebugToolStripMenuItem.Checked = Properties.Settings.Default.LoggingVerbose;
             loggingEnableToolStripMenuItem.Checked = Properties.Settings.Default.LoggingEnable;
             saveCookiesToolStripMenuItem.Checked = Properties.Settings.Default.SaveCookies;
             offlineByDefaultToolStripMenuItem.Checked = Properties.Settings.Default.OfflineByDefault;
             saveCatalogDetailsToolStripMenuItem.Checked = Properties.Settings.Default.SaveCatalogDetails;
-            initializingSettings = false;
+            _initializingSettings = false;
         }
 
         /// <summary>
@@ -79,27 +87,28 @@ namespace VidLec
         private void SetupListViews()
         {
             // Configure the first tree
-            tlvAll.CanExpandGetter = delegate (object x) { return ((Folder)x).childFolders.Count > 0 ? true : false; };
-            tlvAll.ChildrenGetter = delegate (object x) { return ((Folder)x).childFolders; };
+            tlvAll.CanExpandGetter = x => ((Folder) x).ChildFolders.Count > 0;
+            tlvAll.ChildrenGetter = x => ((Folder) x).ChildFolders;
 
-            tlvAllClmCount.AspectToStringConverter = delegate (object x)
-            {
-                return x is int ? ((int) x == 0 ? "" : x.ToString()) : "";
-            };
+            tlvAllClmCount.AspectToStringConverter =
+                x => x is int ? ((int) x == 0 ? "" : x.ToString()) : "";
 
+            olvPresentations.ContextMenu = new ContextMenu();
+            olvPresentations.ContextMenu.MenuItems.Add("Item 1");
+            olvPresentations.ContextMenu.MenuItems.Add("Item 2");
 
             olvPresClmDate.AspectToStringFormat = "{0:dd-MM-yyy}";
-            olvPresClmDate.AspectGetter = delegate (object x) {
-                string date = ((Presentation)x).FullStartDate;
+            olvPresClmDate.AspectGetter = delegate(object x)
+            {
+                string date = ((Presentation) x).FullStartDate;
                 DateTime dt;
                 if (DateTime.TryParseExact(date,
-                                            "MM/dd/yyyy HH:mm:ss",
-                                            CultureInfo.InvariantCulture,
-                                            DateTimeStyles.None,
-                                            out dt))
+                    "MM/dd/yyyy HH:mm:ss",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out dt))
                     return dt.Date;
-                else
-                    return null;
+                return null;
             };
         }
 
@@ -112,32 +121,32 @@ namespace VidLec
             // Try to connect to the internet
             if (setOnline)
             {
-                if (comm.CheckNet())
+                if (_comm.CheckNet())
                 {
-                    bool isLoggedIn = AppConfig.AppInstance.loginResult == LoginManager.LoginResult.SUCCESS;
-                    if (!isLoggedIn && loginManager.Login(true) != LoginManager.LoginResult.SUCCESS)
+                    bool isLoggedIn = AppConfig.AppInstance.LoginResult == LoginManager.LoginResult.Success;
+                    if (!isLoggedIn && _loginManager.Login(true) != LoginManager.LoginResult.Success)
                     {
-                        AppConfig.AppInstance.onlineMode = false;
-                        logger.Info("Failed to log in to the server, offline mode activated");
-                        SetStatus(AppConfig.Constants.offlineModeText, AppConfig.AppColors.BlueText);
+                        AppConfig.AppInstance.OnlineMode = false;
+                        _logger.Info("Failed to log in to the server, offline mode activated");
+                        SetStatus(AppConfig.Constants.OfflineModeText, AppConfig.AppColors.BlueText);
                     }
-                    AppConfig.AppInstance.onlineMode = true;
-                    logger.Info("Online mode activated");
-                    SetStatus(AppConfig.Constants.onlineModeText, AppConfig.AppColors.OKText);
+                    AppConfig.AppInstance.OnlineMode = true;
+                    _logger.Info("Online mode activated");
+                    SetStatus(AppConfig.Constants.OnlineModeText, AppConfig.AppColors.OkText);
                 }
                 else
                 {
-                    AppConfig.AppInstance.onlineMode = false;
-                    logger.Info("Cannot connect to the internet, offline mode activated");
-                    SetStatus(AppConfig.Constants.offlineModeText, AppConfig.AppColors.BlueText);
+                    AppConfig.AppInstance.OnlineMode = false;
+                    _logger.Info("Cannot connect to the internet, offline mode activated");
+                    SetStatus(AppConfig.Constants.OfflineModeText, AppConfig.AppColors.BlueText);
                 }
             }
             // Force offline
             else
             {
-                AppConfig.AppInstance.onlineMode = false;
-                logger.Info("Offline mode activated");
-                SetStatus(AppConfig.Constants.offlineModeText, AppConfig.AppColors.BlueText);
+                AppConfig.AppInstance.OnlineMode = false;
+                _logger.Info("Offline mode activated");
+                SetStatus(AppConfig.Constants.OfflineModeText, AppConfig.AppColors.BlueText);
             }
         }
 
@@ -161,7 +170,8 @@ namespace VidLec
             statusStrip.Invoke(new Action(() => toolStripProgressBar.Value = percentage));
             if (percentage == 100)
             {
-                new Thread(delegate () {
+                new Thread(delegate()
+                {
                     Thread.Sleep(1000);
                     SetProgress(0);
                 }).Start();
@@ -175,15 +185,16 @@ namespace VidLec
         /// <param name="e">Event arguments</param>
         private void SaveSettings(object sender, EventArgs e)
         {
-            if (!initializingSettings) {
+            if (!_initializingSettings)
+            {
                 Properties.Settings.Default.SaveCookies = saveCookiesToolStripMenuItem.Checked;
                 Properties.Settings.Default.OfflineByDefault = offlineByDefaultToolStripMenuItem.Checked;
                 Properties.Settings.Default.SaveCatalogDetails = saveCatalogDetailsToolStripMenuItem.Checked;
                 Properties.Settings.Default.LoggingVerbose = loggingDebugToolStripMenuItem.Checked;
 
-                loginManager.SetLoggingBoxLogLevel(LogLevel.Debug, loggingDebugToolStripMenuItem.Checked);
+                _loginManager.SetLoggingBoxLogLevel(LogLevel.Debug, loggingDebugToolStripMenuItem.Checked);
                 if (sender == loggingDebugToolStripMenuItem)
-                    logger.Debug(string.Format("Debug logging set to: {0}", loggingDebugToolStripMenuItem.Checked));
+                    _logger.Debug($"Debug logging set to: {loggingDebugToolStripMenuItem.Checked}");
 
                 Properties.Settings.Default.Save();
             }
@@ -196,47 +207,44 @@ namespace VidLec
         /// <returns>Wheter finding a root was successful</returns>
         private bool SetRootFolder()
         {
-            Folder storedRoot = fileManager.GetStoredCatalogDetails();
+            Folder storedRoot = _fileManager.GetStoredCatalogDetails();
             if (Properties.Settings.Default.SaveCatalogDetails && storedRoot != null)
             {
-                logger.Debug("Using saved catalog details");
-                AppConfig.AppInstance.rootFolder = storedRoot;
+                _logger.Debug("Using saved catalog details");
+                AppConfig.AppInstance.RootFolder = storedRoot;
             }
             else
             {
-                logger.Debug("Getting catalog details from comm");
-                string rawCatalogDetails = comm.GetCatalogDetails();
-                logger.Debug("Serialize catalog details");
+                _logger.Debug("Getting catalog details from comm");
+                string rawCatalogDetails = _comm.GetCatalogDetails();
+                _logger.Debug("Serialize catalog details");
                 Folder rootFolder = DataParser.ParseCatalogDetails(rawCatalogDetails);
                 if (Properties.Settings.Default.SaveCatalogDetails)
                 {
-                    logger.Debug("Saving serialized classes to file");
-                    fileManager.SaveCatalogDetails(rootFolder);
+                    _logger.Debug("Saving serialized classes to file");
+                    _fileManager.SaveCatalogDetails(rootFolder);
                 }
-                AppConfig.AppInstance.rootFolder = rootFolder;
+                AppConfig.AppInstance.RootFolder = rootFolder;
             }
 
-            if (AppConfig.AppInstance.rootFolder == null)
+            if (AppConfig.AppInstance.RootFolder == null)
             {
-                logger.Error("Could not get a root folder");
+                _logger.Error("Could not get a root folder");
                 return false;
             }
-            else
-            {
-                logger.Debug("Successfully loaded root folder");
-                return true;
-            }
+            _logger.Debug("Successfully loaded root folder");
+            return true;
         }
 
         #region GUI events
 
         private void LectureSelector_Load(object sender, EventArgs e)
         {
-            logger.Debug("Form loaded, attemting to set root folder for catalog details");
+            _logger.Debug("Form loaded, attemting to set root folder for catalog details");
             if (SetRootFolder())
             {
-                tlvAll.AddObject(AppConfig.AppInstance.rootFolder);
-                tlvAll.Expand(AppConfig.AppInstance.rootFolder);
+                tlvAll.AddObject(AppConfig.AppInstance.RootFolder);
+                tlvAll.Expand(AppConfig.AppInstance.RootFolder);
             }
         }
 
@@ -253,8 +261,8 @@ namespace VidLec
 
         private void openLogWindowStripMenuItem_Click(object sender, EventArgs e)
         {
-            logForm.Show();
-            logForm.Focus();
+            _logForm.Show();
+            _logForm.Focus();
         }
 
         private void viewLogToolStripMenuItem_Click(object sender, EventArgs e)
@@ -262,8 +270,9 @@ namespace VidLec
             string logFilePath = Path.Combine(
                 SimpleLayout.Evaluate(LogManager.Configuration.Variables["logDirectory"].Text) +
                 SimpleLayout.Evaluate(LogManager.Configuration.Variables["currentDate"].Text) +
-                SimpleLayout.Evaluate(LogManager.Configuration.Variables["logFileExtension"].Text));//.Replace('/','\\');
-            logger.Debug(string.Format("Trying to open logfile located at \"{0}\"", logFilePath));
+                SimpleLayout.Evaluate(LogManager.Configuration.Variables["logFileExtension"].Text));
+                //.Replace('/','\\');
+            _logger.Debug($"Trying to open logfile located at \"{logFilePath}\"");
             Process.Start(logFilePath);
         }
 
@@ -271,14 +280,14 @@ namespace VidLec
         {
             if (loggingEnableToolStripMenuItem.Checked)
             {
-                logForm.Show();
-                logForm.Focus();
+                _logForm.Show();
+                _logForm.Focus();
                 LogManager.EnableLogging();
-                logger.Info("Logging enabled");
+                _logger.Info("Logging enabled");
             }
             else
             {
-                logForm.Hide();
+                _logForm.Hide();
                 LogManager.DisableLogging();
             }
             Properties.Settings.Default.LoggingEnable = loggingEnableToolStripMenuItem.Checked;
@@ -289,7 +298,7 @@ namespace VidLec
         {
             Properties.Settings.Default.LoginCookieData = "";
             Properties.Settings.Default.Save();
-            logger.Info("Deleted saved cookie (note: Cookies for current session are still cached)");
+            _logger.Info("Deleted saved cookie (note: Cookies for current session are still cached)");
         }
 
         private void deleteSavedCredentailsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -297,27 +306,28 @@ namespace VidLec
             Properties.Settings.Default.Username = "";
             Properties.Settings.Default.Password = "";
             Properties.Settings.Default.Save();
-            logger.Info("Deleted saved credentials");
+            _logger.Info("Deleted saved credentials");
         }
 
         private void resetAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.Reset();
             SetFormSettings();
-            logger.Info("Reset all settings to default");
+            _logger.Info("Reset all settings to default");
         }
 
-        List<Folder> expandedObjects = null;
-        string lastSearchString = "";
+        List<Folder> _expandedObjects = null;
+        string _lastSearchString = "";
+
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
             if (txtSearch.Text != "")
             {
-                if (lastSearchString == "")
+                if (_lastSearchString == "")
                 {
-                    expandedObjects = new List<Folder>();
+                    _expandedObjects = new List<Folder>();
                     foreach (Folder f in tlvAll.ExpandedObjects)
-                        expandedObjects.Add(f);
+                        _expandedObjects.Add(f);
                 }
 
                 tlvAll.ExpandAll();
@@ -329,11 +339,97 @@ namespace VidLec
             {
                 tlvAll.ModelFilter = null;
                 tlvAll.CollapseAll();
-                foreach (Folder f in expandedObjects)
+                foreach (Folder f in _expandedObjects)
                     tlvAll.Expand(f);
             }
-            lastSearchString = txtSearch.Text;
+            _lastSearchString = txtSearch.Text;
+        }
+
+        private void tlvAll_ItemActivate(object sender, EventArgs e)
+        {
+            Folder f = (Folder)tlvAll.SelectedObject;
+            olvPresentations.ClearObjects();
+
+            TextOverlay textOverlay = new TextOverlay();
+            textOverlay.Alignment = ContentAlignment.MiddleCenter;
+            textOverlay.TextColor = Color.Black;
+            textOverlay.BackColor = Color.AntiqueWhite;
+            textOverlay.BorderColor = Color.Black;
+            textOverlay.BorderWidth = 2f;
+            textOverlay.Font = new Font("Microsoft Sans Serif", 36);
+            textOverlay.Text = "Loading..";
+
+            olvPresentations.OverlayText = textOverlay;
+
+            Thread thread = new Thread(() => ThreadedPresentationGetter(f));
+            thread.Start();
         }
         #endregion
+
+        private void ThreadedPresentationGetter(Folder folder)
+        {
+            JObject o = _comm.GetPresentationsForFolder(folder);
+            if (o == null)
+            {
+                _logger.Error("Could not get presentations for this folder..");
+                return;
+            }
+            Presentation[] presentations = new Presentation[(int)o["TotalItems"]];
+            JArray rawPresentations = (JArray) o["PresentationDetailsList"];
+
+            for (int i = 0; i < rawPresentations.Count; i++)
+            {
+                Presentation presentation = rawPresentations[i].ToObject<Presentation>();
+                presentations[i] = presentation;
+            }
+
+            olvPresentations.Invoke(new Action(() => PresentationLoader(presentations)));
+        }
+
+        private void PresentationLoader(Presentation[] presentations)
+        {
+            olvPresentations.AddObjects(presentations);
+            olvPresentations.OverlayText = null;
+        }
+
+        private void olvPresentations_ItemActivate(object sender, EventArgs e)
+        {
+            Presentation p = (Presentation)olvPresentations.SelectedObject;
+            JObject o = _comm.GetPlayerOptionsForPresentation(p);
+            if (o == null)
+            {
+                _logger.Error("Could not get player options for this presentation..");
+                return;
+            }
+
+            try
+            {
+                Dictionary<string, string> videoUrls = new Dictionary<string, string>();
+                JArray streams = (JArray) o["d"]["Presentation"]["Streams"];
+                bool multipleStreams = streams.Count > 1;
+                int i = 1;
+                foreach (JObject stream in streams)
+                {
+                    foreach (JObject urls in stream["VideoUrls"])
+                    {
+                        videoUrls.Add((multipleStreams ? $"Stream{i} - " : null) + $"{urls["MediaType"]}",
+                            urls["Location"].ToString());
+                    }
+                    i++;
+                }
+
+                if (videoUrls.Count == 0)
+                {
+                    _logger.Error("No player options found for this presentation");
+                    return;
+                }
+
+                (new LectureViewer(videoUrls)).Show();
+            }
+            catch (Exception)
+            {
+                _logger.Error("Player options for presentation was unexpected");
+            }
+        }
     }
 }

@@ -10,15 +10,15 @@ namespace VidLec
 {
     class FileManager
     {
-        private Logger logger = LogManager.GetCurrentClassLogger();
-        private string catalogDetailsPath = Path.Combine(AppConfig.Constants.appDataFolder, AppConfig.Constants.catalogDetailsSubDir);
-        private string videoPath = Path.Combine(AppConfig.Constants.appDataFolder, AppConfig.Constants.videoSubDir);
+        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private string _catalogDetailsPath = Path.Combine(AppConfig.Constants.AppDataFolder, AppConfig.Constants.CatalogDetailsSubDir);
+        private string _videoPath = Path.Combine(AppConfig.Constants.AppDataFolder, AppConfig.Constants.VideoSubDir);
 
         public FileManager()
         {
-            List<string> directories = new List<string> { AppConfig.Constants.appDataFolder,
-                                                          catalogDetailsPath,
-                                                          videoPath };
+            List<string> directories = new List<string> { AppConfig.Constants.AppDataFolder,
+                                                          _catalogDetailsPath,
+                                                          _videoPath };
             foreach (string dir in directories)
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
@@ -32,9 +32,9 @@ namespace VidLec
 
         public void SaveCatalogDetails(Folder rootFolder)
         {
-            string serializationFile = Path.Combine(catalogDetailsPath, DateTime.Now.ToBinary() + ".bin");
+            string serializationFile = Path.Combine(_catalogDetailsPath, DateTime.Now.ToBinary() + ".bin");
 
-            ClearPath(catalogDetailsPath);
+            ClearPath(_catalogDetailsPath);
 
             using (Stream stream = File.Open(serializationFile, FileMode.Create))
             {
@@ -45,13 +45,12 @@ namespace VidLec
 
         public Folder GetStoredCatalogDetails()
         {
-            if (Directory.GetFiles(catalogDetailsPath).Count() == 0)
+            if (Directory.GetFiles(_catalogDetailsPath).Count() == 0)
                 return null;
-            else if (Directory.GetFiles(catalogDetailsPath).Count() == 1)
+            if (Directory.GetFiles(_catalogDetailsPath).Count() == 1)
             {
-                string fullPath = Directory.GetFiles(catalogDetailsPath)[0];
+                string fullPath = Directory.GetFiles(_catalogDetailsPath)[0];
                 string fileName = Path.GetFileNameWithoutExtension(fullPath);
-                DateTime now = DateTime.Now;
                 TimeSpan diff = TimeSpan.Zero;
                 try
                 {
@@ -59,34 +58,28 @@ namespace VidLec
                 }
                 catch (Exception)
                 {
-                    logger.Debug("Could not parse datetime of catalog details file");
+                    _logger.Debug("Could not parse datetime of catalog details file");
                 }
-                if (diff == TimeSpan.Zero || diff.Days > AppConfig.AppChosenVariables.catalogDetailsRetentionDays)
+                if (diff == TimeSpan.Zero || diff.Days > AppConfig.AppChosenVariables.CatalogDetailsRetentionDays)
                 {
-                    logger.Debug("Catalog details file not valid");
-                    ClearPath(catalogDetailsPath);
+                    _logger.Debug("Catalog details file not valid");
+                    ClearPath(_catalogDetailsPath);
                     return null;
                 }
-                else
+                using (Stream stream = File.Open(fullPath, FileMode.Open))
                 {
-                    using (Stream stream = File.Open(fullPath, FileMode.Open))
-                    {
-                        var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                        return (Folder)bformatter.Deserialize(stream);
-                    }
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    return (Folder)bformatter.Deserialize(stream);
                 }
             }
-            else if (Directory.GetFiles(catalogDetailsPath).Count() > 1)
+            if (Directory.GetFiles(_catalogDetailsPath).Count() > 1)
             {
-                logger.Error("Found multiple catalog details files, cleaning up..");
-                ClearPath(catalogDetailsPath);
+                _logger.Error("Found multiple catalog details files, cleaning up..");
+                ClearPath(_catalogDetailsPath);
                 return null;
             }
-            else
-            {
-                logger.Error("Something extraordinary weird happend, please do report this!");
-                return null;
-            }
+            _logger.Error("Something extraordinary weird happend, please do report this!");
+            return null;
         }
     }
 }

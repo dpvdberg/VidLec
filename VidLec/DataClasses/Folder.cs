@@ -9,9 +9,9 @@ namespace VidLec
     [Serializable]
     public class Folder
     {
-        public List<Folder> childFolders = new List<Folder>();
+        public List<Folder> ChildFolders = new List<Folder>();
 
-        public string id { get; set; }
+        public string Id { get; set; }
         public string ParentCatalogFolderId { get; set; }
         public string CatalogId { get; set; }
         public string DynamicFolderId { get; set; }
@@ -30,25 +30,25 @@ namespace VidLec
         public string IncludeSubFolders { get; set; }
         public string DatabaseId { get; set; }
         public string SecurityId { get; set; }
-        public int Count { get {
-                if (hasChilds())
-                    return getBaseCount();
-                else
-                    return 0;
-            } }
-
-        public bool hasChilds()
+        public int Count { get
         {
-            if (childFolders.Count > 0)
-                return true;
-            else
-                return false;
+            if (HasChilds())
+                    return GetBaseCount();
+            return 0;
+        }
         }
 
-        public bool isParent(Folder parent)
+        public bool HasChilds()
         {
-            if (parent.childFolders.Count > 0)
-                foreach (Folder f in parent.childFolders)
+            if (ChildFolders.Count > 0)
+                return true;
+            return false;
+        }
+
+        public bool IsParent(Folder parent)
+        {
+            if (parent.ChildFolders.Count > 0)
+                foreach (Folder f in parent.ChildFolders)
                 {
                     if (ParentCatalogFolderId == f.DynamicFolderId)
                         return true;
@@ -56,22 +56,22 @@ namespace VidLec
             return false;
         }
 
-        public int getBaseCount()
+        public int GetBaseCount()
         {
-            return getBaseList().Count;
+            return GetBaseList().Count;
         }
 
-        public List<Folder> getBaseList(bool reset = true, Folder parent = null)
+        public List<Folder> GetBaseList(bool reset = true, Folder parent = null)
         {
             if (reset)
                 parent = this;
             List<Folder> baseList = new List<Folder>(); 
-            if (parent.hasChilds())
+            if (parent.HasChilds())
             {
-                foreach (Folder f in parent.childFolders)
+                foreach (Folder f in parent.ChildFolders)
                 {
-                    if (f.hasChilds())
-                        baseList.AddRange(getBaseList(false, f));
+                    if (f.HasChilds())
+                        baseList.AddRange(GetBaseList(false, f));
                     else
                         baseList.Add(f);
                 }

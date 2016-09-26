@@ -11,22 +11,24 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace VidLec
 {
     class Comm
     {
-        private Logger logger;
+        private Logger _logger;
 
         public Comm()
         {
             if (Properties.Settings.Default.LoggingEnable)
-                logger = LogManager.GetCurrentClassLogger();
+                _logger = LogManager.GetCurrentClassLogger();
         }
 
         #region Arbitrary comm related methods
         [System.Runtime.InteropServices.DllImport("wininet.dll")]
-        private extern static bool InternetGetConnectedState(out int Description, int ReservedValue);
+        private extern static bool InternetGetConnectedState(out int description, int reservedValue);
 
         /// <summary>
         /// Returns if the computer is connected to the internet
@@ -54,8 +56,8 @@ namespace VidLec
             Properties.Settings.Default.Password = remember ? password : "";
             Properties.Settings.Default.Save();
 
-            AppConfig.AppInstance.username = username;
-            AppConfig.AppInstance.password = password;
+            AppConfig.AppInstance.Username = username;
+            AppConfig.AppInstance.Password = password;
 
             bool loginValid = SetLoginCookie(saveCookie);
             if (loginValid)
@@ -66,22 +68,22 @@ namespace VidLec
         /// <summary>
         /// Finds and sets the catalog url in the AppConfig
         /// </summary>
-        public bool SetCatalogURL(int tryCounter = 1)
+        public bool SetCatalogUrl(int tryCounter = 1)
         {
-            if (tryCounter > AppConfig.Constants.connectionTries)
+            if (tryCounter > AppConfig.Constants.ConnectionTries)
             {
-                logger.Debug("Could not find catalog URL, stopping..");
+                _logger.Debug("Could not find catalog URL, stopping..");
                 return false;
             }
-            else if (tryCounter > 1)
-                logger.Debug(string.Format("Requesting catalog URL, try {0}", tryCounter));
+            if (tryCounter > 1)
+                _logger.Debug($"Requesting catalog URL, try {tryCounter}");
             else
-                logger.Debug("Requesting catalog URL..");
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.SiteData.baseURL);
+                _logger.Debug("Requesting catalog URL..");
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.SiteData.BaseUrl);
 
             webRequest.Method = "GET";
             webRequest.AllowAutoRedirect = false;
-            webRequest.Timeout = AppConfig.Constants.connectionTimeout;
+            webRequest.Timeout = AppConfig.Constants.ConnectionTimeout;
 
             HttpWebResponse myResp = null;
             try
@@ -92,25 +94,24 @@ namespace VidLec
             {
                 if (e.Status == WebExceptionStatus.Timeout)
                 {
-                    logger.Debug("Request timed out");
-                    return SetCatalogURL(tryCounter + 1);
+                    _logger.Debug("Request timed out");
+                    return SetCatalogUrl(tryCounter + 1);
                 }
-                else throw;
+                throw;
             }
             if (myResp.StatusCode == HttpStatusCode.Redirect)
             {
-                string[] redirectHeader = myResp.Headers.GetValues(AppConfig.SiteData.redirectHeaderName);
+                string[] redirectHeader = myResp.Headers.GetValues(AppConfig.SiteData.RedirectHeaderName);
                 if (redirectHeader != null && redirectHeader.Length == 1)
                 {
-                    AppConfig.AppInstance.catalogURL = redirectHeader[0];
-                    logger.Debug(string.Format("Got catalog url: {0}", redirectHeader[0]));
+                    AppConfig.AppInstance.CatalogUrl = redirectHeader[0];
+                    _logger.Debug($"Got catalog url: {redirectHeader[0]}");
                     return true;
                 }
-                else
-                    logger.Error("Login cookie header was not found");
+                _logger.Error("Login cookie header was not found");
             }
             else
-                logger.Error(string.Format("Login reponse was unexpected ({0})", (int)myResp.StatusCode));
+                _logger.Error($"Login reponse was unexpected ({(int) myResp.StatusCode})");
             return false;
         }
 
@@ -120,29 +121,29 @@ namespace VidLec
         /// <returns>Validity of the cookie</returns>
         public bool ValidateCookie(bool useSavedCookie = false, int tryCounter = 1)
         {
-            if (tryCounter > AppConfig.Constants.connectionTries)
+            if (tryCounter > AppConfig.Constants.ConnectionTries)
             {
-                logger.Debug("Could not validate cookie, stopping..");
+                _logger.Debug("Could not validate cookie, stopping..");
                 return false;
             }
-            else if (tryCounter > 1)
-                logger.Debug(string.Format("Testing cookie, try {0}", tryCounter));
+            if (tryCounter > 1)
+                _logger.Debug($"Testing cookie, try {tryCounter}");
             else
-                logger.Debug("Testing cookie..");
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.AppInstance.catalogURL);
+                _logger.Debug("Testing cookie..");
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.AppInstance.CatalogUrl);
 
             CookieContainer loginCookieContainer = new CookieContainer();
-            Uri target = new Uri(AppConfig.AppInstance.catalogURL);
-            loginCookieContainer.Add(new Cookie(AppConfig.SiteData.cookieFieldName,
+            Uri target = new Uri(AppConfig.AppInstance.CatalogUrl);
+            loginCookieContainer.Add(new Cookie(AppConfig.SiteData.CookieFieldName,
                 AppConfig.SiteData.GetCookieValue(
-                    AppConfig.SiteData.cookieFieldName,
-                    useSavedCookie ? Properties.Settings.Default.LoginCookieData : AppConfig.AppInstance.cookieData)) { Domain = target.Host});
+                    AppConfig.SiteData.CookieFieldName,
+                    useSavedCookie ? Properties.Settings.Default.LoginCookieData : AppConfig.AppInstance.CookieData)) { Domain = target.Host});
             webRequest.CookieContainer = loginCookieContainer;
             webRequest.Method = "GET";
             webRequest.AllowAutoRedirect = false;
-            webRequest.Timeout = AppConfig.Constants.connectionTimeout;
+            webRequest.Timeout = AppConfig.Constants.ConnectionTimeout;
 
-            HttpWebResponse myResp = null;
+            HttpWebResponse myResp;
             try {
                 myResp = (HttpWebResponse)webRequest.GetResponse();
             }
@@ -150,35 +151,34 @@ namespace VidLec
             {
                 if (e.Status == WebExceptionStatus.Timeout)
                 {
-                    logger.Debug("Request timed out");
+                    _logger.Debug("Request timed out");
                     return ValidateCookie(useSavedCookie, tryCounter + 1);
                 }
-                else throw;
+                throw;
             }
             if (myResp.StatusCode == HttpStatusCode.OK)
             {
                 using (var reader = new StreamReader(myResp.GetResponseStream(), ASCIIEncoding.ASCII))
                 {
                     string pageData = reader.ReadToEnd();
-                    if (pageData.Contains(AppConfig.SiteData.validCookieMagicKeyword))
+                    if (pageData.Contains(AppConfig.SiteData.ValidCookieMagicKeyword))
                     {
                         if (useSavedCookie)
-                            AppConfig.AppInstance.cookieData = Properties.Settings.Default.LoginCookieData;
-                        logger.Info("Cookie valid, logged in!");
+                            AppConfig.AppInstance.CookieData = Properties.Settings.Default.LoginCookieData;
+                        _logger.Info("Cookie valid, logged in!");
                         if (GetCatalogId(pageData))
-                            logger.Debug("Found catalogId");
+                            _logger.Debug("Found catalogId");
                         else
-                            logger.Error("Could not find catalogId");
+                            _logger.Error("Could not find catalogId");
                         return true;
                     }
-                    else
-                        logger.Error("Response using cookie was unexpected");
+                    _logger.Error("Response using cookie was unexpected");
                 }
             }
             else if (myResp.StatusCode == HttpStatusCode.Redirect)
-                logger.Error("Saved cookie invalid, login attempt gave redirect (302)");
+                _logger.Error("Saved cookie invalid, login attempt gave redirect (302)");
             else
-                logger.Error(string.Format("Login reponse was unexpected ({0})", (int)myResp.StatusCode));
+                _logger.Error($"Login reponse was unexpected ({(int) myResp.StatusCode})");
 
             return false;
         }
@@ -191,17 +191,16 @@ namespace VidLec
         private bool GetCatalogId(string pageData)
         {
             try {
-                int beginIndex = pageData.IndexOf(AppConfig.SiteData.catalogFieldName);
+                int beginIndex = pageData.IndexOf(AppConfig.SiteData.CatalogFieldName);
                 int startIndex = pageData.IndexOf('\'', beginIndex) + 1;
                 int stopIndex = pageData.IndexOf('\'', startIndex);
                 string rawId = pageData.Substring(startIndex, stopIndex - startIndex);
                 if (rawId != "")
                 {
-                    AppConfig.AppInstance.catalogId = rawId;
+                    AppConfig.AppInstance.CatalogId = rawId;
                     return true;
                 }
-                else
-                    return false;
+                return false;
             } catch (Exception)
             {
                 return false;
@@ -214,30 +213,30 @@ namespace VidLec
         /// <returns>Raw catalog details</returns>
         public string GetCatalogDetails(int tryCounter = 1)
         {
-            if (tryCounter > AppConfig.Constants.connectionTries)
+            if (tryCounter > AppConfig.Constants.ConnectionTries)
             {
-                logger.Debug("Could get catalog ID, stopping..");
+                _logger.Debug("Could get catalog ID, stopping..");
                 return "";
             }
-            else if (tryCounter > 1)
-                logger.Debug(string.Format("Getting catalog ID, try {0}", tryCounter));
+            if (tryCounter > 1)
+                _logger.Debug($"Getting catalog ID, try {tryCounter}");
             else
-                logger.Debug("Getting catalog ID..");
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.SiteData.catalogDetailsURL);
+                _logger.Debug("Getting catalog ID..");
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.SiteData.CatalogDetailsUrl);
             byte[] postData = Encoding.UTF8.GetBytes(AppConfig.SiteData.GetCatalogRequestBody());
 
             CookieContainer loginCookieContainer = new CookieContainer();
-            Uri target = new Uri(AppConfig.AppInstance.catalogURL);
-            loginCookieContainer.Add(new Cookie(AppConfig.SiteData.cookieFieldName,
+            Uri target = new Uri(AppConfig.AppInstance.CatalogUrl);
+            loginCookieContainer.Add(new Cookie(AppConfig.SiteData.CookieFieldName,
                 AppConfig.SiteData.GetCookieValue(
-                    AppConfig.SiteData.cookieFieldName,
-                    AppConfig.AppInstance.cookieData))
+                    AppConfig.SiteData.CookieFieldName,
+                    AppConfig.AppInstance.CookieData))
             { Domain = target.Host });
             webRequest.CookieContainer = loginCookieContainer;
             webRequest.Method = "POST";
             webRequest.ContentLength = postData.Length;
-            webRequest.ContentType = AppConfig.SiteData.catalogContentTypeHeader;
-            webRequest.Timeout = AppConfig.Constants.connectionTimeout;
+            webRequest.ContentType = AppConfig.SiteData.RequestDataTypeHeader;
+            webRequest.Timeout = AppConfig.Constants.ConnectionTimeout;
 
             using (var stream = webRequest.GetRequestStream())
             {
@@ -253,17 +252,16 @@ namespace VidLec
             {
                 if (e.Status == WebExceptionStatus.Timeout)
                 {
-                    logger.Debug("Request timed out");
+                    _logger.Debug("Request timed out");
                     return GetCatalogDetails(tryCounter + 1);
                 }
-                else throw;
+                throw;
             }
 
             if (myResp.StatusCode == HttpStatusCode.OK)
                 using (var reader = new StreamReader(myResp.GetResponseStream(), ASCIIEncoding.ASCII))
                     return reader.ReadToEnd();
-            else
-                logger.Error(string.Format("Unexpected response while receiving catalog details ({0})", (int) myResp.StatusCode));
+            _logger.Error($"Unexpected response while receiving catalog details ({(int) myResp.StatusCode})");
             return "";
         }
 
@@ -275,29 +273,37 @@ namespace VidLec
         /// <returns>Whether a cookie is found or not</returns>
         private bool SetLoginCookie(bool saveCookie, int tryCounter = 1)
         {
-            if (tryCounter > AppConfig.Constants.connectionTries)
+            if (tryCounter > AppConfig.Constants.ConnectionTries)
             {
-                logger.Debug("Could not get cookie, stopping..");
+                _logger.Debug("Could not get cookie, stopping..");
                 return false;
             }
-            else if (tryCounter > 1)
-                logger.Debug(string.Format("Getting cookie, try {0}", tryCounter));
+            if (tryCounter > 1)
+                _logger.Debug($"Getting cookie, try {tryCounter}");
             else
-                logger.Debug("Getting cookie..");
-            HttpWebRequest webRequest = (HttpWebRequest) WebRequest.Create(AppConfig.SiteData.loginURL);
+                _logger.Debug("Getting cookie..");
+            HttpWebRequest webRequest = (HttpWebRequest) WebRequest.Create(AppConfig.SiteData.LoginUrl);
             byte[] postData = AppConfig.SiteData.GetLoginPostData();
 
             webRequest.Method = "POST";
             webRequest.ContentLength = postData.Length;
-            webRequest.ContentType = AppConfig.SiteData.loginContentTypeHeader;
+            webRequest.ContentType = AppConfig.SiteData.LoginContentTypeHeader;
             // Make sure we do not redirect, cookie can be found in redirect
             // This will also improve performance
             webRequest.AllowAutoRedirect = false;
-            webRequest.Timeout = AppConfig.Constants.connectionTimeout;
+            webRequest.Timeout = AppConfig.Constants.ConnectionTimeout;
 
-            using (var stream = webRequest.GetRequestStream())
+            try
             {
-                stream.Write(postData, 0, postData.Length);
+                using (var stream = webRequest.GetRequestStream())
+                {
+                    stream.Write(postData, 0, postData.Length);
+                }
+            }
+            catch (Exception)
+            {
+                _logger.Debug("Could not get request stream");
+                return SetLoginCookie(saveCookie, tryCounter + 1);
             }
 
             HttpWebResponse myResp = null;
@@ -309,39 +315,156 @@ namespace VidLec
             {
                 if (e.Status == WebExceptionStatus.Timeout)
                 {
-                    logger.Debug("Request timed out");
+                    _logger.Debug("Request timed out");
                     return SetLoginCookie(saveCookie, tryCounter + 1);
                 }
-                else throw;
+                throw;
             }
             if (myResp.StatusCode == HttpStatusCode.Redirect)
             {
-                string[] setCookieHeader = myResp.Headers.GetValues(AppConfig.SiteData.cookieHeaderName);
+                string[] setCookieHeader = myResp.Headers.GetValues(AppConfig.SiteData.CookieHeaderName);
                 if (setCookieHeader != null)
                 {
-                    string loginCookie = setCookieHeader.FirstOrDefault(p => p.Contains(AppConfig.SiteData.cookieFieldName));
+                    string loginCookie = setCookieHeader.FirstOrDefault(p => p.Contains(AppConfig.SiteData.CookieFieldName));
                     if (loginCookie == default(string))
                     {
-                        logger.Error("Login field in header was not found");
+                        _logger.Error("Login field in header was not found");
                     }
                     else
                     {
-                        AppConfig.AppInstance.cookieData = loginCookie;
+                        AppConfig.AppInstance.CookieData = loginCookie;
                         if (saveCookie)
                         {
                             Properties.Settings.Default.LoginCookieData = loginCookie;
                             Properties.Settings.Default.Save();
                         }
-                        logger.Debug(string.Format("Got loginCookie:\n{0}", loginCookie));
+                        _logger.Debug($"Got loginCookie:\n{loginCookie}");
                         return true;
                     }
                 }
                 else
-                    logger.Error("Login cookie header was not found");
+                    _logger.Error("Login cookie header was not found");
             }
             else
-                logger.Error(string.Format("Login reponse was unexpected ({0})", (int)myResp.StatusCode));
+                _logger.Error($"Login reponse was unexpected ({(int) myResp.StatusCode})");
             return false;
+        }
+
+        public JObject GetPresentationsForFolder(Folder folder)
+        {
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.SiteData.PresentationForFolderUrl);
+            byte[] postData = Encoding.UTF8.GetBytes(AppConfig.SiteData.GetPresentationsForFolderRequestBody(folder));
+
+            CookieContainer loginCookieContainer = new CookieContainer();
+            Uri target = new Uri(AppConfig.AppInstance.CatalogUrl);
+            loginCookieContainer.Add(new Cookie(AppConfig.SiteData.CookieFieldName,
+                AppConfig.SiteData.GetCookieValue(
+                    AppConfig.SiteData.CookieFieldName,
+                    AppConfig.AppInstance.CookieData))
+            { Domain = target.Host });
+            webRequest.CookieContainer = loginCookieContainer;
+            webRequest.Method = "POST";
+            webRequest.ContentLength = postData.Length;
+            webRequest.ContentType = AppConfig.SiteData.RequestDataTypeHeader;
+            webRequest.Timeout = AppConfig.Constants.ConnectionTimeout;
+
+            try
+            {
+                using (var stream = webRequest.GetRequestStream())
+                {
+                    stream.Write(postData, 0, postData.Length);
+                }
+            }
+            catch (Exception)
+            {
+                _logger.Debug("Could not get request stream");
+                return null;
+            }
+
+            HttpWebResponse myResp;
+            try
+            {
+                myResp = (HttpWebResponse)webRequest.GetResponse();
+            }
+            catch (WebException e)
+            {
+                if (e.Status == WebExceptionStatus.Timeout)
+                {
+                    _logger.Debug("Request timed out");
+                    return null;
+                }
+                throw;
+            }
+            try
+            {
+                if (myResp.StatusCode == HttpStatusCode.OK)
+                    using (var reader = new StreamReader(myResp.GetResponseStream(), ASCIIEncoding.ASCII))
+                        return JObject.Parse(reader.ReadToEnd());
+            }
+            catch (Exception)
+            {
+                _logger.Error($"Unexpected response while receiving catalog details ({(int) myResp.StatusCode})");
+            }
+            return null;
+        }
+
+        public JObject GetPlayerOptionsForPresentation(Presentation presentation)
+        {
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(AppConfig.SiteData.VideoForPresentationUrl);
+            byte[] postData = Encoding.UTF8.GetBytes(AppConfig.SiteData.GetVideoForPresentationRequestBody(presentation));
+
+            CookieContainer loginCookieContainer = new CookieContainer();
+            Uri target = new Uri(AppConfig.AppInstance.CatalogUrl);
+            loginCookieContainer.Add(new Cookie(AppConfig.SiteData.CookieFieldName,
+                AppConfig.SiteData.GetCookieValue(
+                    AppConfig.SiteData.CookieFieldName,
+                    AppConfig.AppInstance.CookieData))
+            { Domain = target.Host });
+            webRequest.CookieContainer = loginCookieContainer;
+            webRequest.Method = "POST";
+            webRequest.ContentLength = postData.Length;
+            webRequest.ContentType = AppConfig.SiteData.RequestDataTypeHeader;
+            webRequest.Timeout = AppConfig.Constants.ConnectionTimeout;
+
+            try
+            {
+                using (var stream = webRequest.GetRequestStream())
+                {
+                    stream.Write(postData, 0, postData.Length);
+                }
+            }
+            catch (Exception)
+            {
+                _logger.Debug("Could not get request stream");
+                return null;
+            }
+
+            HttpWebResponse myResp;
+            try
+            {
+                myResp = (HttpWebResponse)webRequest.GetResponse();
+            }
+            catch (WebException e)
+            {
+                if (e.Status == WebExceptionStatus.Timeout)
+                {
+                    _logger.Debug("Request timed out");
+                    return null;
+                }
+                throw;
+            }
+
+            try
+            {
+                if (myResp.StatusCode == HttpStatusCode.OK)
+                    using (var reader = new StreamReader(myResp.GetResponseStream(), ASCIIEncoding.ASCII))
+                        return JObject.Parse(reader.ReadToEnd());
+            }
+            catch (Exception)
+            {
+                _logger.Error($"Unexpected response while receiving catalog details ({(int)myResp.StatusCode})");
+            }
+            return null;
         }
     }
 }

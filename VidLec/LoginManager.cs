@@ -11,38 +11,45 @@ namespace VidLec
 {
     public class LoginManager
     {
-        LogForm logForm = new LogForm();
-        Comm comm;
-        Logger logger;
+        LogForm _logForm = new LogForm();
+        Comm _comm;
+        Logger _logger;
 
-        public LoginManager()
+        public LoginManager(bool hasVlcLib)
         {
             // First initialize the logger
             if (Properties.Settings.Default.LoggingEnable)
             {
                 // Show log form before creating loggers
-                logForm.Show();
+                _logForm.Show();
                 // Create loggers
-                logger = LogManager.GetCurrentClassLogger();
+                _logger = LogManager.GetCurrentClassLogger();
                 // Set debug log level for log box
                 SetLoggingBoxLogLevel(LogLevel.Debug, Properties.Settings.Default.LoggingVerbose);
             }
-            comm = new Comm();
+            if (!hasVlcLib)
+            {
+                _logger.Error("Could not extract VLC library!");
+                MessageBox.Show("This program cannot start without the VLC library!", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                Environment.Exit(0);
+            }
+            _comm = new Comm();
         }
 
         public void AutoLogin()
         {
-            if (comm.CheckNet())
+            if (_comm.CheckNet())
             {
-                logger.Debug("Connected to the internet");
+                _logger.Debug("Connected to the internet");
                 Login();
-                Application.Run(new LectureSelector(this, logForm));
             }
             else
             {
-                logger.Info("Computer not connected to the internet, entering offline mode");
-                AppConfig.AppInstance.loginResult = LoginResult.OFFLINE;
+                _logger.Info("Computer not connected to the internet, entering offline mode");
+                AppConfig.AppInstance.LoginResult = LoginResult.Offline;
             }
+            Application.Run(new LectureSelector(this, _logForm));
         }
 
         public LoginResult Login(bool forceOnline = false)
@@ -50,94 +57,89 @@ namespace VidLec
             InitializationStatus initStatus = GetInitializationFlag();
             if (Properties.Settings.Default.LoggingVerbose)
             {
-                if (initStatus.HasFlag(InitializationStatus.COOKIE))
-                    logger.Debug("Saved cookies found");
-                if (initStatus.HasFlag(InitializationStatus.CREDENTIALS))
-                    logger.Debug("Saved credentials found");
-                if (initStatus.HasFlag(InitializationStatus.COULD_NOT_GET_CATALOG))
-                    logger.Error("Could not find catalog");
+                if (initStatus.HasFlag(InitializationStatus.Cookie))
+                    _logger.Debug("Saved cookies found");
+                if (initStatus.HasFlag(InitializationStatus.Credentials))
+                    _logger.Debug("Saved credentials found");
+                if (initStatus.HasFlag(InitializationStatus.CouldNotGetCatalog))
+                    _logger.Error("Could not find catalog");
             }
             LoginResult loginResult = GetLoginResult(initStatus, forceOnline);
-            if (loginResult.HasFlag(LoginResult.FAILED))
-                loginResult = askLogin();
-            if (loginResult.HasFlag(LoginResult.OFFLINE))
-                logger.Info("Going offline");
+            if (loginResult.HasFlag(LoginResult.Failed))
+                loginResult = AskLogin();
+            if (loginResult.HasFlag(LoginResult.Offline))
+                _logger.Info("Going offline");
 
-            AppConfig.AppInstance.loginResult = loginResult;
+            AppConfig.AppInstance.LoginResult = loginResult;
             return loginResult;
         }
 
-        private LoginResult askLogin()
+        private LoginResult AskLogin()
         {
             if ((new LoginForm()).ShowDialog() == DialogResult.OK)
-                return LoginResult.SUCCESS;
-            else
-                return LoginResult.OFFLINE;
+                return LoginResult.Success;
+            return LoginResult.Offline;
         }
 
         [Flags]
         private enum InitializationStatus
         {
-            NULL = 0,
-            COOKIE = 1,
-            CREDENTIALS = 2,
-            COULD_NOT_GET_CATALOG = 4
+            Null = 0,
+            Cookie = 1,
+            Credentials = 2,
+            CouldNotGetCatalog = 4
         }
 
         [Flags]
         public enum LoginResult
         {
-            NULL = 0,
-            OFFLINE = 1,
-            FAILED = 2,
-            SUCCESS = 4
+            Null = 0,
+            Offline = 1,
+            Failed = 2,
+            Success = 4
         }
 
         private InitializationStatus GetInitializationFlag()
         {
-            InitializationStatus status = InitializationStatus.NULL;
+            InitializationStatus status = InitializationStatus.Null;
             // See what the user has saved
-            if (comm.SetCatalogURL())
+            if (_comm.SetCatalogUrl())
             {
                 if (Properties.Settings.Default.LoginCookieData != "")
-                    status |= InitializationStatus.COOKIE;
+                    status |= InitializationStatus.Cookie;
                 if (Properties.Settings.Default.Username != "" && Properties.Settings.Default.Password != "")
-                    status |= InitializationStatus.CREDENTIALS;
+                    status |= InitializationStatus.Credentials;
                 return status;
             }
-            else
-                return InitializationStatus.COULD_NOT_GET_CATALOG;
+            return InitializationStatus.CouldNotGetCatalog;
         }
 
         private LoginResult GetLoginResult(InitializationStatus initStatus, bool forceOnline = false)
         {
-            if ((!forceOnline && Properties.Settings.Default.OfflineByDefault) || initStatus.HasFlag(InitializationStatus.COULD_NOT_GET_CATALOG))
-                return LoginResult.OFFLINE;
+            if ((!forceOnline && Properties.Settings.Default.OfflineByDefault) || initStatus.HasFlag(InitializationStatus.CouldNotGetCatalog))
+                return LoginResult.Offline;
 
-            if (initStatus.HasFlag(InitializationStatus.COOKIE))
+            if (initStatus.HasFlag(InitializationStatus.Cookie))
             {
-                if (comm.ValidateCookie(true))
-                    return LoginResult.SUCCESS;
-                else
-                {
-                    logger.Debug("Cookie is invalid, removing..");
-                    Properties.Settings.Default.LoginCookieData = "";
-                    Properties.Settings.Default.Save();
-                }
+                if (_comm.ValidateCookie(true))
+                    return LoginResult.Success;
+                _logger.Debug("Cookie is invalid, removing..");
+                Properties.Settings.Default.LoginCookieData = "";
+                Properties.Settings.Default.Save();
             }
 
-            if (initStatus.HasFlag(InitializationStatus.CREDENTIALS))
+            if (initStatus.HasFlag(InitializationStatus.Credentials))
             {
-                logger.Debug("Logging in using credentials..");
-                if (comm.Login(Properties.Settings.Default.Username,
+                _logger.Debug("Logging in using credentials..");
+                if (_comm.Login(Properties.Settings.Default.Username,
                     Properties.Settings.Default.Password,
                     true,
                     Properties.Settings.Default.SaveCookies))
-                    return LoginResult.SUCCESS;
+                    return LoginResult.Success;
                 
             }
 
-            return LoginResult.FAILED;
+            return LoginResult.Failed;
         }
 
         /// <summary>

@@ -44,6 +44,6 @@ namespace VidLec
         public string TimelineHits { get; set; }
         public int Views { get; set; }
 
-        public List<Presenter> presenters { get; set; }
+        public List<Presenter> Presenters { get; set; }
     }
 }

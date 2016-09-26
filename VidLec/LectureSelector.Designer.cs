@@ -81,15 +81,15 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TLPSplit.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.TLPSplit.ColumnCount = 2;
-            this.TLPSplit.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TLPSplit.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.TLPSplit.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46.15385F));
+            this.TLPSplit.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 53.84615F));
             this.TLPSplit.Controls.Add(this.olvPresentations, 1, 0);
             this.TLPSplit.Controls.Add(this.tlvAll, 0, 0);
             this.TLPSplit.Location = new System.Drawing.Point(12, 72);
             this.TLPSplit.Name = "TLPSplit";
             this.TLPSplit.RowCount = 1;
             this.TLPSplit.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TLPSplit.Size = new System.Drawing.Size(838, 293);
+            this.TLPSplit.Size = new System.Drawing.Size(937, 344);
             this.TLPSplit.TabIndex = 0;
             // 
             // olvPresentations
@@ -110,31 +110,32 @@
             this.olvPresClmViews,
             this.olvPresClmDesc});
             this.olvPresentations.Cursor = System.Windows.Forms.Cursors.Default;
-            this.olvPresentations.HighlightBackgroundColor = System.Drawing.Color.Empty;
-            this.olvPresentations.HighlightForegroundColor = System.Drawing.Color.Empty;
-            this.olvPresentations.Location = new System.Drawing.Point(422, 4);
+            this.olvPresentations.Location = new System.Drawing.Point(436, 4);
             this.olvPresentations.Name = "olvPresentations";
-            this.olvPresentations.Size = new System.Drawing.Size(412, 285);
+            this.olvPresentations.Size = new System.Drawing.Size(497, 336);
             this.olvPresentations.TabIndex = 1;
             this.olvPresentations.UseCompatibleStateImageBehavior = false;
             this.olvPresentations.View = System.Windows.Forms.View.Details;
+            this.olvPresentations.ItemActivate += new System.EventHandler(this.olvPresentations_ItemActivate);
             // 
             // olvPresClmName
             // 
             this.olvPresClmName.AspectName = "Name";
+            this.olvPresClmName.Groupable = false;
             this.olvPresClmName.Text = "Name";
+            this.olvPresClmName.Width = 180;
             // 
             // olvPresClmDate
             // 
             this.olvPresClmDate.AspectName = "FullStartDate";
             this.olvPresClmDate.Text = "Date";
-            this.olvPresClmDate.Width = 102;
+            this.olvPresClmDate.Width = 80;
             // 
             // olvPresClmDuration
             // 
             this.olvPresClmDuration.AspectName = "DurationDisplay";
             this.olvPresClmDuration.Text = "Duration";
-            this.olvPresClmDuration.Width = 54;
+            this.olvPresClmDuration.Width = 55;
             // 
             // olvPresClmViews
             // 
@@ -159,17 +160,16 @@
             this.tlvAllClmName,
             this.tlvAllClmCount});
             this.tlvAll.Cursor = System.Windows.Forms.Cursors.Default;
-            this.tlvAll.HighlightBackgroundColor = System.Drawing.Color.Empty;
-            this.tlvAll.HighlightForegroundColor = System.Drawing.Color.Empty;
             this.tlvAll.Location = new System.Drawing.Point(4, 4);
             this.tlvAll.Name = "tlvAll";
             this.tlvAll.ShowGroups = false;
-            this.tlvAll.Size = new System.Drawing.Size(411, 285);
+            this.tlvAll.Size = new System.Drawing.Size(425, 336);
             this.tlvAll.TabIndex = 2;
             this.tlvAll.UseCompatibleStateImageBehavior = false;
             this.tlvAll.UseFiltering = true;
             this.tlvAll.View = System.Windows.Forms.View.Details;
             this.tlvAll.VirtualMode = true;
+            this.tlvAll.ItemActivate += new System.EventHandler(this.tlvAll_ItemActivate);
             // 
             // tlvAllClmName
             // 
@@ -193,7 +193,7 @@
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripProgressBar,
             this.toolStripStatusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(731, 368);
+            this.statusStrip.Location = new System.Drawing.Point(920, 442);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.statusStrip.Size = new System.Drawing.Size(119, 22);
@@ -383,7 +383,7 @@
             this.optionsToolStripMenuItem,
             this.NetworkStatusStrip});
             this.menuStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
-            this.menuStrip.Location = new System.Drawing.Point(672, 32);
+            this.menuStrip.Location = new System.Drawing.Point(771, 30);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(181, 25);
             this.menuStrip.TabIndex = 2;
@@ -391,7 +391,8 @@
             // 
             // txtSearch
             // 
-            this.txtSearch.Location = new System.Drawing.Point(62, 370);
+            this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtSearch.Location = new System.Drawing.Point(62, 421);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(100, 20);
             this.txtSearch.TabIndex = 3;
@@ -399,8 +400,9 @@
             // 
             // lblSearch
             // 
+            this.lblSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblSearch.AutoSize = true;
-            this.lblSearch.Location = new System.Drawing.Point(12, 373);
+            this.lblSearch.Location = new System.Drawing.Point(12, 424);
             this.lblSearch.Name = "lblSearch";
             this.lblSearch.Size = new System.Drawing.Size(44, 13);
             this.lblSearch.TabIndex = 4;
@@ -410,7 +412,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(862, 394);
+            this.ClientSize = new System.Drawing.Size(961, 445);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.txtSearch);
             this.Controls.Add(this.statusStrip);

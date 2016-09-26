@@ -12,10 +12,10 @@ namespace VidLec
 {
     public partial class LogForm : Form
     {
-        private double backgroundOpacity = 0.4;
+        private double _backgroundOpacity = 0.4;
         public LogForm()
         {
-            this.Opacity = backgroundOpacity;
+            this.Opacity = _backgroundOpacity;
             InitializeComponent();
         }
 
@@ -27,7 +27,7 @@ namespace VidLec
         private void LogForm_Deactivate(object sender, EventArgs e)
         {
             if (!this.Disposing)
-                this.Opacity = backgroundOpacity;
+                this.Opacity = _backgroundOpacity;
         }
 
         private void LogForm_FormClosing(object sender, FormClosingEventArgs e)

@@ -13,34 +13,36 @@ namespace VidLec
 {
     public partial class LoginForm : Form
     {
-        Logger logger;
-        Comm comm;
+        Logger _logger;
+        Comm _comm;
 
         public LoginForm()
         {
             // First initialize the logger
             if (Properties.Settings.Default.LoggingEnable)
-                logger = LogManager.GetCurrentClassLogger();
-            comm = new Comm();            
+                _logger = LogManager.GetCurrentClassLogger();
+            _comm = new Comm();            
             InitializeComponent();
             chkSaveCookie.Checked = Properties.Settings.Default.SaveCookies;
+            txtUsername.Text = Properties.Settings.Default.Username;
+            txtPassword.Text = Properties.Settings.Default.Password;
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
             if (!bgwLogin.IsBusy)
             {
-                SetStatus(AppConfig.Constants.loggingInText, AppConfig.AppColors.OKText);
+                SetStatus(AppConfig.Constants.LoggingInText, AppConfig.AppColors.OkText);
                 bgwLogin.RunWorkerAsync();
             }
         }
 
         private void bgwLogin_DoWork(object sender, DoWorkEventArgs e)
         {
-            logger.Debug("Asking comm class to log in");
+            _logger.Debug("Asking comm class to log in");
             Properties.Settings.Default.SaveCookies = chkSaveCookie.Checked;
             Properties.Settings.Default.Save();
-            e.Result = comm.Login(txtUsername.Text, txtPassword.Text, chkRemember.Checked, chkSaveCookie.Checked);
+            e.Result = _comm.Login(txtUsername.Text, txtPassword.Text, chkRemember.Checked, chkSaveCookie.Checked);
         }
 
         private void bgwLogin_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

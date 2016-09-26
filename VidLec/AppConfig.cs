@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using VidLec.DataClasses.Requests;
 
 namespace VidLec
 {
@@ -13,20 +15,20 @@ namespace VidLec
     {
         public static class AppInstance
         {
-            public static LoginManager.LoginResult loginResult;
-            public static bool onlineMode = false;
-            public static string cookieData = "";
-            public static string username = "";
-            public static string password = "";
+            public static LoginManager.LoginResult LoginResult;
+            public static bool OnlineMode = false;
+            public static string CookieData = "";
+            public static string Username = "";
+            public static string Password = "";
 
-            public static string catalogURL = "";
-            public static string catalogId = "";
-            public static Folder rootFolder = null;
+            public static string CatalogUrl = "";
+            public static string CatalogId = "";
+            public static Folder RootFolder = null;
         }
 
         public static class AppChosenVariables
         {
-            public static int catalogDetailsRetentionDays = 7;
+            public static int CatalogDetailsRetentionDays = 7;
         }
 
         public static class SiteData
@@ -34,44 +36,46 @@ namespace VidLec
             /// <summary>
             /// URL constants
             /// </summary>
-            public const string baseURL = "http://videocollege.tue.nl";
-            public const string loginURL = baseURL + "/Mediasite/Login/";
-            public const string catalogDetailsURL = baseURL + "/Mediasite/Catalog/Data/GetCatalogDetails";
+            public const string BaseUrl = "http://videocollege.tue.nl";
+            public const string LoginUrl = BaseUrl + "/Mediasite/Login/";
+            public const string CatalogDetailsUrl = BaseUrl + "/Mediasite/Catalog/Data/GetCatalogDetails";
+            public const string PresentationForFolderUrl = BaseUrl + "/Mediasite/Catalog/Data/GetPresentationsForFolder";
+            public const string VideoForPresentationUrl = BaseUrl + "/Mediasite/PlayerService/PlayerService.svc/json/GetPlayerOptions";
 
             // Redirect (302) header name
-            public const string redirectHeaderName = "Location";
+            public const string RedirectHeaderName = "Location";
 
             /// <summary>
             /// Login related constants
             /// </summary>
-            public const string catalogContentTypeHeader = "application/json; charset=utf-8";
-            public const string loginContentTypeHeader = "application/x-www-form-urlencoded";
-            public const string cookieFieldName = "MediasiteAuth";
-            public const string cookieHeaderName = "Set-Cookie";
-            public const string validCookieMagicKeyword = "Authenticated=\"True\"";
-            public const string catalogFieldName = "CatalogId";
-            public static Dictionary<string, string> loginPostParameters = new Dictionary<string, string>()
+            public const string RequestDataTypeHeader = "application/json; charset=utf-8";
+            public const string LoginContentTypeHeader = "application/x-www-form-urlencoded";
+            public const string CookieFieldName = "MediasiteAuth";
+            public const string CookieHeaderName = "Set-Cookie";
+            public const string ValidCookieMagicKeyword = "Authenticated=\"True\"";
+            public const string CatalogFieldName = "CatalogId";
+            public static Dictionary<string, string> LoginPostParameters = new Dictionary<string, string>()
             {
-                { "UserName", AppInstance.username},
-                { "Password", AppInstance.password},
+                { "UserName", AppInstance.Username},
+                { "Password", AppInstance.Password},
                 { "RememberMe", "false"}
             };
 
             /// <summary>
             /// JSON constants
             /// </summary>
-            public const string jsonNavigationFoldersName = "NavigationFolders";
+            public const string JsonNavigationFoldersName = "NavigationFolders";
 
             public static byte[] GetLoginPostData()
             {
                 string postData = "";
 
-                loginPostParameters["UserName"] = AppInstance.username;
-                loginPostParameters["Password"] = AppInstance.password;
+                LoginPostParameters["UserName"] = AppInstance.Username;
+                LoginPostParameters["Password"] = AppInstance.Password;
 
-                foreach (KeyValuePair<string, string> parameter in loginPostParameters)
+                foreach (KeyValuePair<string, string> parameter in LoginPostParameters)
                 {
-                    postData += string.Format("{0}={1}&", parameter.Key, parameter.Value);
+                    postData += $"{parameter.Key}={parameter.Value}&";
                 }
 
                 return Encoding.ASCII.GetBytes(postData.Trim('&'));
@@ -92,10 +96,45 @@ namespace VidLec
             public static string GetCatalogRequestBody()
             {
                 JObject o = new JObject();
-                o["CatalogId"] = AppInstance.catalogId;
-                o["CurrentFolderId"] = AppInstance.catalogId;
-                o["Url"] = AppInstance.catalogURL;
+                o["CatalogId"] = AppInstance.CatalogId;
+                o["CurrentFolderId"] = AppInstance.CatalogId;
+                o["Url"] = AppInstance.CatalogUrl;
                 return o.ToString();
+            }
+
+            public static string GetPresentationsForFolderRequestBody(Folder folder)
+            {
+                GetPresentationsForFolderRequest body = new GetPresentationsForFolderRequest();
+                body.IsViewPage = true;
+                body.IsNewFolder = true;
+                body.AuthTicket = null;
+                body.CatalogId = AppInstance.CatalogId;
+                body.CurrentFolderId = folder.DynamicFolderId;
+                body.RootDynamicFolderId = AppInstance.CatalogId;
+                body.ItemsPerPage = 100;
+                body.PageIndex = 0;
+                body.PermissionMask = "Execute";
+                body.CatalogSearchType = "SearchInFolder";
+                body.SortBy = "Date";
+                body.SortDirection = "Descending";
+                body.StartDate = null;
+                body.EndDate = null;
+                body.StatusFilterList = null;
+                body.PreviewKey = null;
+                body.Tags = new List<object>();
+
+                return JsonConvert.SerializeObject(body);
+            }
+
+            public static string GetVideoForPresentationRequestBody(Presentation presentation)
+            {
+                GetVideoForPresentationRequest body = new GetVideoForPresentationRequest();
+                body.getPlayerOptionsRequest = new GetPlayerOptionsRequest();
+                body.getPlayerOptionsRequest.QueryString = $"?catalog={AppInstance.CatalogId}";
+                body.getPlayerOptionsRequest.ResourceId = presentation.Id;
+                body.getPlayerOptionsRequest.UseScreenReader = false;
+
+                return JsonConvert.SerializeObject(body);
             }
         }
 
@@ -108,35 +147,36 @@ namespace VidLec
             /// <summary>
             /// Numeric constants
             /// </summary>
-            public const int connectionTries = 5;
-            public const int connectionTimeout = 5000;
+            public const int ConnectionTries = 3;
+            public const int ConnectionTimeout = 3000;
 
             /// <summary>
             /// Auxiliary
             /// </summary>
-            public const string appName = "VidLec";
-            public const string DateTimeFTM = "O";
+            public const string AppName = "VidLec";
+            public const string DateTimeFtm = "O";
 
             #region Text
-            public const string loggingInText = "Logging in..";
-            public const string loggedIn = "Logged in";
-            public const string serverError = "Server error";
-            public const string onlineModeText = "Online mode activated";
-            public const string offlineModeText = "Offline mode activated";
+            public const string LoggingInText = "Logging in..";
+            public const string LoggedIn = "Logged in";
+            public const string ServerError = "Server error";
+            public const string OnlineModeText = "Online mode activated";
+            public const string OfflineModeText = "Offline mode activated";
 
-            public const string noConnectionText = "No network connection available, entering offline mode..";
+            public const string NoConnectionText = "No network connection available, entering offline mode..";
 
-            public const string statusWaitText = "Waiting for user input";
-            public const string loadingDataText = "Getting data from server..";
-            public const string loadedText = "Loaded successfully";
-            public const string loadingErrorText = "Error loading folders..";
+            public const string StatusWaitText = "Waiting for user input";
+            public const string LoadingDataText = "Getting data from server..";
+            public const string LoadedText = "Loaded successfully";
+            public const string LoadingErrorText = "Error loading folders..";
             #endregion
             #region Path and system variables
-            public static readonly string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            public static readonly string appDataFolder = Path.Combine(localAppData, appName);
-            public const string catalogDetailsSubDir = "CatalogDetails";
-            public const string videoSubDir = "Videos";
-            public const string logSubDir = "logs";
+            public static readonly string LocalAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            public static readonly string AppDataFolder = Path.Combine(LocalAppData, AppName);
+            public const string CatalogDetailsSubDir = "CatalogDetails";
+            public const string VideoSubDir = "Videos";
+            public const string LogSubDir = "logs";
+            public const string LibVlcDir = "lib";
             #endregion
         }
 
@@ -146,7 +186,7 @@ namespace VidLec
         public static class AppColors
         {
             public static readonly Color ErrorText = Color.Red;
-            public static readonly Color OKText = Color.SeaGreen;
+            public static readonly Color OkText = Color.SeaGreen;
             public static readonly Color BlueText = Color.RoyalBlue;
         }
     }
